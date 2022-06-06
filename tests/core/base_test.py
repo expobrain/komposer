@@ -1,0 +1,300 @@
+from typing import Optional, Sequence
+
+import pytest
+from pytest_mock import MockerFixture
+
+from komposer.core.base import (
+    ensure_ingress_tls_is_valid_json,
+    ensure_service_name_lowercase_RFC_1123,
+    ensure_unique_ports_on_docker_compose,
+    generate_manifest_from_docker_compose,
+)
+from komposer.exceptions import (
+    ComposePortsNotUniqueError,
+    IngressTlsException,
+    IngressTlsInvalidJsonError,
+    IngressTlsNotAListError,
+    InvalidServiceNameError,
+)
+from komposer.types import docker_compose, kubernetes
+from komposer.types.cli import Context
+from tests.fixtures import make_context, make_labels
+
+
+def make_minimal_docker_compose() -> docker_compose.DockerCompose:
+    return docker_compose.DockerCompose(services={"my-service": docker_compose.Service()})
+
+
+def make_minimal_service() -> kubernetes.Service:
+    return kubernetes.Service(
+        apiversion="v1",
+        kind="Service",
+        metadata=kubernetes.Metadata(
+            name="test-project-test-repository-test-branch-my-service", labels=make_labels()
+        ),
+        spec=kubernetes.ServiceSpec(ports=[], selector=make_labels()),
+    )
+
+
+def make_minimal_deployment() -> kubernetes.Deployment:
+    return kubernetes.Deployment(
+        apiversion="v1",
+        kind="Deployment",
+        metadata=kubernetes.Metadata(
+            name="test-project-test-repository-test-branch", labels=make_labels()
+        ),
+        spec=kubernetes.DeploymentSpec(
+            hostAliases=[],
+            selector=kubernetes.Selector(matchLabels=make_labels()),
+            template=kubernetes.Template(
+                metadata=kubernetes.UnnamedMetadata(labels=make_labels()),
+                spec=kubernetes.TemplateSpec(),
+            ),
+        ),
+    )
+
+
+def make_minimal_ingress() -> kubernetes.Ingress:
+    return kubernetes.Ingress(
+        metadata=kubernetes.Metadata(
+            name="test-project-test-repository-test-branch-my-service",
+            labels=make_labels(),
+            annotations={"cert-manager.io/cluster-issuer": "letsencrypt-prod"},
+        ),
+        spec=kubernetes.IngressSpec(
+            tls=[
+                kubernetes.IngressTls(
+                    hosts=[
+                        (
+                            "my-service"
+                            ".test-project-test-repository-test-branch"
+                            ".svc.cluster.local"
+                        )
+                    ],
+                    secretName="plum-app-tls-cert",
+                )
+            ],
+            rules=[
+                kubernetes.IngressRule(
+                    host=(
+                        "my-service"
+                        ".test-project-test-repository-test-branch"
+                        ".svc.cluster.local"
+                    ),
+                    http=kubernetes.HttpPaths(
+                        paths=[
+                            kubernetes.HttpPath(
+                                path="/",
+                                pathType=kubernetes.PathType.PREFIX,
+                                backend=kubernetes.Backend(
+                                    service=kubernetes.ServiceRef(
+                                        name="test-project-test-repository-test-branch-my-service",  # noqa: E501
+                                        port=kubernetes.ServiceRefPort(number=8080),
+                                    )
+                                ),
+                            )
+                        ]
+                    ),
+                )
+            ],
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    "services",
+    [
+        pytest.param(
+            {
+                "service1": docker_compose.Service(ports=["8080"]),
+                "service2": docker_compose.Service(ports=["8080"]),
+            },
+            id="Same single ports",
+        ),
+        pytest.param(
+            {
+                "service1": docker_compose.Service(ports=["9000:8080"]),
+                "service2": docker_compose.Service(ports=["8000:8080"]),
+            },
+            id="Same host:container ports",
+        ),
+    ],
+)
+def test_ensure_unique_ports_on_docker_compose_fails(services: docker_compose.Services) -> None:
+    """
+    GIVEN a Docker Compose file
+        AND two services hvae the same internal port
+    WHEN chekcing that all the service uses unique ports
+    THEN raises an exception
+    """
+    # GIVEN
+    compose = docker_compose.DockerCompose(services=services)
+
+    # WHEN
+    with pytest.raises(ComposePortsNotUniqueError):
+        ensure_unique_ports_on_docker_compose(compose)
+
+
+@pytest.mark.parametrize(
+    "compose",
+    [
+        pytest.param(
+            make_minimal_docker_compose(),
+            id="Valid service name",
+        ),
+    ],
+)
+def test_ensure_service_name_lowercase_RFC_1123(compose: docker_compose.DockerCompose) -> None:
+    """
+    GIVEN a Docker Compose file
+        AND a service name in lowercase RFC 1123 format
+    WHEN checking all the service names
+    THEN no exception is raised
+    """
+    # WHEN
+    ensure_service_name_lowercase_RFC_1123(compose)
+
+
+@pytest.mark.parametrize(
+    "compose",
+    [
+        pytest.param(
+            docker_compose.DockerCompose(services={"my_service": docker_compose.Service()}),
+            id="Invalid service name",
+        ),
+        pytest.param(
+            docker_compose.DockerCompose(services={"MY_SERVICE": docker_compose.Service()}),
+            id="Invalid uppercase service name",
+        ),
+    ],
+)
+def test_ensure_service_name_lowercase_RFC_1123_fails(
+    compose: docker_compose.DockerCompose,
+) -> None:
+    """
+    GIVEN a Docker Compose file
+        AND an invalid service name
+    WHEN checking all the service names
+    THEN an exception is raised
+    """
+    # WHEN
+    with pytest.raises(InvalidServiceNameError):
+        ensure_service_name_lowercase_RFC_1123(compose)
+
+
+@pytest.mark.parametrize(
+    "context, compose, config_maps, deployment, services, external_items, expected",
+    [
+        pytest.param(
+            make_context(),
+            make_minimal_docker_compose(),
+            [],
+            make_minimal_deployment(),
+            [make_minimal_service()],
+            [],
+            kubernetes.List(
+                items=[
+                    make_minimal_deployment(),
+                    make_minimal_service(),
+                ]
+            ),
+            id="Single service",
+        ),
+        pytest.param(
+            make_context(ingress_for_service="my-service"),
+            make_minimal_docker_compose(),
+            [],
+            make_minimal_deployment(),
+            [make_minimal_service()],
+            [],
+            kubernetes.List(
+                items=[
+                    make_minimal_deployment(),
+                    make_minimal_service(),
+                    make_minimal_ingress(),
+                ]
+            ),
+            id="Single service with ingress",
+        ),
+    ],
+)
+def test_generate_manifest_from_docker_compose(
+    mocker: MockerFixture,
+    context: Context,
+    compose: docker_compose.DockerCompose,
+    config_maps: Sequence[kubernetes.ConfigMap],
+    deployment: kubernetes.Deployment,
+    services: Sequence[kubernetes.Service],
+    external_items: kubernetes.List,
+    expected: kubernetes.List,
+) -> None:
+    """
+    GIVEN a Docker Compose file
+    WHEN generating a manifest
+    THEN a manifest is returned
+    """
+    # GIVEN
+    mocker.patch("komposer.core.base.parse_docker_compose_file", return_value=compose)
+    mocker.patch("komposer.core.base.generate_config_maps", return_value=config_maps)
+    mocker.patch("komposer.core.base.generate_deployment", return_value=deployment)
+    mocker.patch("komposer.core.base.generate_services", return_value=services)
+    mocker.patch("komposer.core.base.load_extra_manifest", return_value=external_items)
+
+    if context.ingress_for_service:
+        mocker.patch(
+            "komposer.core.base.generate_ingress_from_services",
+            return_value=make_minimal_ingress(),
+        )
+
+    # WHEN
+    actual = generate_manifest_from_docker_compose(context)
+
+    # THEN
+    assert actual.dict() == expected.dict()
+
+
+@pytest.mark.parametrize(
+    "ingress_tls_str",
+    [
+        pytest.param(None, id="No TLS"),
+        pytest.param("[]", id="List"),
+    ],
+)
+def test_ensure_ingress_tls_is_valid_json(ingress_tls_str: Optional[str]) -> None:
+    """
+    GIVEN a valid Ingress TLS string
+    WHEN ensuring that it's a valid JSON
+    THEN no exception is raised
+    """
+    # GIVEN
+    context = make_context(ingress_tls_str=ingress_tls_str)
+
+    # WHEN
+    ensure_ingress_tls_is_valid_json(context)
+
+
+@pytest.mark.parametrize(
+    "ingress_tls_str, exception",
+    [
+        pytest.param("", IngressTlsInvalidJsonError, id="Empty string"),
+        pytest.param("  ", IngressTlsInvalidJsonError, id="Empty string with spaces"),
+        pytest.param("aaa", IngressTlsInvalidJsonError, id="Single string"),
+        pytest.param("{", IngressTlsInvalidJsonError, id="Broken JSON"),
+        pytest.param("{}", IngressTlsNotAListError, id="Empty object"),
+        pytest.param('{"key":"value"}', IngressTlsNotAListError, id="Empty object"),
+    ],
+)
+def test_ensure_ingress_tls_is_valid_json_fails(
+    ingress_tls_str: str, exception: type[IngressTlsException]
+) -> None:
+    """
+    GIVEN an invalid Ingress TLS string
+    WHEN ensuring that it's a valid JSON
+    THEN raise an exception
+    """
+    # GIVEN
+    context = make_context(ingress_tls_str=ingress_tls_str)
+
+    # WHEN
+    with pytest.raises(exception):
+        ensure_ingress_tls_is_valid_json(context)
