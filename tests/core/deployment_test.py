@@ -259,7 +259,7 @@ def test_generate_deployment_env_file(
 
 @pytest.mark.parametrize(
     "services",
-    [{"my_service": docker_compose.Service(command="python run.py", env_file=".env.docker")}],
+    [{"my_service": docker_compose.Service(command="python run.py")}],
 )
 @pytest.mark.parametrize(
     "deployment_annotations_str, expected",
@@ -288,3 +288,31 @@ def test_generate_deployment_with_extra_annotations(
 
     # THEN
     assert actual.metadata.annotations == expected
+
+
+@pytest.mark.parametrize(
+    "services",
+    [{"my_service": docker_compose.Service(command="python run.py")}],
+)
+@pytest.mark.parametrize(
+    "service_account_name",
+    [None, "my-service-account"],
+)
+def test_generate_deployment_with_service_account_name(
+    service_account_name: Optional[str], services: docker_compose.Services
+) -> None:
+    """
+    GIVEN a Docker Compose services
+        AND a service account name
+    WHEN generating a deployment
+    THEN a Deployment is returned
+        AND the service account name matches the expected
+    """
+    # GIVEN
+    context = make_context(deployment_service_account_name=service_account_name)
+
+    # WHEN
+    actual = generate_deployment(context, services)
+
+    # THEN
+    assert actual.spec.template.spec.service_account_name == service_account_name

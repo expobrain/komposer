@@ -28,7 +28,11 @@ def generate_deployment(
             selector=kubernetes.Selector(matchLabels=dict(metadata.labels)),
             template=kubernetes.Template(
                 metadata=kubernetes.UnnamedMetadata(labels=dict(metadata.labels)),
-                spec=kubernetes.TemplateSpec(hostAliases=host_aliases, containers=containers),
+                spec=kubernetes.TemplateSpec(
+                    hostAliases=host_aliases,
+                    containers=containers,
+                    serviceAccountName=context.deployment.service_account_name,
+                ),
             ),
         ),
     )

@@ -76,6 +76,9 @@ def output_manifest(manifest: kubernetes.List) -> None:
         "It's your responsibility to make sure that it's a valid Kubernetes config fragment. "
     ),
 )
+@click.option(
+    "--deployment-service-account-name", help="Service account name to be used for the Deployment."
+)
 def main(
     compose_file: Path,
     project_name: str,
@@ -86,6 +89,7 @@ def main(
     extra_manifest: Optional[Path] = None,
     ingress_tls_file: Optional[Path] = None,
     deployment_annotations_file: Optional[Path] = None,
+    deployment_service_account_name: Optional[Path] = None,
 ) -> None:
     ingress_tls_str = ingress_tls_file.read_text() if ingress_tls_file else None
     deployment_annotations_str = (
@@ -101,7 +105,10 @@ def main(
         ingress_for_service=ingress_for_service,
         extra_manifest_path=extra_manifest,
         ingress=IngressContext(tls_str=ingress_tls_str),
-        deployment=DeploymentContext(annotations_str=deployment_annotations_str),
+        deployment=DeploymentContext(
+            annotations_str=deployment_annotations_str,
+            deployment_service_account_name=deployment_service_account_name,
+        ),
     )
 
     manifest_data = generate_manifest_from_docker_compose(context)
