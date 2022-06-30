@@ -66,7 +66,7 @@ def generate_ingress_from_services(
         metadata=metadata,
         spec=kubernetes.IngressSpec(
             rules=[kubernetes.IngressRule(host=host, http=kubernetes.HttpPaths(paths=paths))],
-            tls=context.ingress_tls,
+            tls=context.ingress.tls,
         ),
     )
 

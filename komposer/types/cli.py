@@ -7,6 +7,31 @@ from komposer.types.base import ImmutableBaseModel
 from komposer.utils import to_kubernetes_name
 
 
+def parse_str_as_yaml(value_str: Optional[str]) -> Any:
+    if value_str is None:
+        return None
+
+    value = yaml.safe_load(value_str)
+
+    return value
+
+
+class DeploymentContext(ImmutableBaseModel):
+    annotations_str: Optional[str] = None
+
+    @property
+    def annotations(self) -> Optional[Any]:
+        return parse_str_as_yaml(self.annotations_str)
+
+
+class IngressContext(ImmutableBaseModel):
+    tls_str: Optional[str] = None
+
+    @property
+    def tls(self) -> Optional[Any]:
+        return parse_str_as_yaml(self.tls_str)
+
+
 class Context(ImmutableBaseModel):
     docker_compose_path: Path
     project_name: str
@@ -15,17 +40,8 @@ class Context(ImmutableBaseModel):
     default_image: str
     ingress_for_service: Optional[str] = None
     extra_manifest_path: Optional[Path] = None
-    ingress_tls_str: Optional[str] = None
-    deployment_annotations_str: Optional[str] = None
-
-    @staticmethod
-    def __parse_str_as_yaml(value_str: Optional[str]) -> Any:
-        if value_str is None:
-            return None
-
-        value = yaml.safe_load(value_str)
-
-        return value
+    deployment: DeploymentContext
+    ingress: IngressContext
 
     @property
     def project_name_kubernetes(self) -> str:
@@ -48,11 +64,3 @@ class Context(ImmutableBaseModel):
                 self.branch_name_kubernetes,
             ]
         )
-
-    @property
-    def ingress_tls(self) -> Optional[Any]:
-        return self.__parse_str_as_yaml(self.ingress_tls_str)
-
-    @property
-    def deployment_annotations(self) -> Optional[Any]:
-        return self.__parse_str_as_yaml(self.deployment_annotations_str)
