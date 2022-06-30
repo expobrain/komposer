@@ -4,15 +4,19 @@ import pytest
 from pytest_mock import MockerFixture
 
 from komposer.core.base import (
-    ensure_ingress_tls_is_valid_json,
+    ensure_deployment_annotations_is_valid_yaml,
+    ensure_ingress_tls_is_valid_yaml,
     ensure_service_name_lowercase_RFC_1123,
     ensure_unique_ports_on_docker_compose,
     generate_manifest_from_docker_compose,
 )
 from komposer.exceptions import (
     ComposePortsNotUniqueError,
+    DeploymentAnnotationsException,
+    DeploymentAnnotationsInvaliYamlError,
+    DeploymentAnnotationsNotAMappingError,
     IngressTlsException,
-    IngressTlsInvalidJsonError,
+    IngressTlsInvalidYamlError,
     IngressTlsNotAListError,
     InvalidServiceNameError,
 )
@@ -258,38 +262,38 @@ def test_generate_manifest_from_docker_compose(
     [
         pytest.param(None, id="No TLS"),
         pytest.param("[]", id="List"),
+        pytest.param("", id="Empty string"),
+        pytest.param("  ", id="Empty string with spaces"),
     ],
 )
-def test_ensure_ingress_tls_is_valid_json(ingress_tls_str: Optional[str]) -> None:
+def test_ensure_ingress_tls_is_valid_yaml(ingress_tls_str: Optional[str]) -> None:
     """
     GIVEN a valid Ingress TLS string
-    WHEN ensuring that it's a valid JSON
+    WHEN ensuring that it's a valid YAML
     THEN no exception is raised
     """
     # GIVEN
     context = make_context(ingress_tls_str=ingress_tls_str)
 
     # WHEN
-    ensure_ingress_tls_is_valid_json(context)
+    ensure_ingress_tls_is_valid_yaml(context)
 
 
 @pytest.mark.parametrize(
     "ingress_tls_str, exception",
     [
-        pytest.param("", IngressTlsInvalidJsonError, id="Empty string"),
-        pytest.param("  ", IngressTlsInvalidJsonError, id="Empty string with spaces"),
-        pytest.param("aaa", IngressTlsInvalidJsonError, id="Single string"),
-        pytest.param("{", IngressTlsInvalidJsonError, id="Broken JSON"),
+        pytest.param("aaa", IngressTlsNotAListError, id="Single string"),
+        pytest.param("{", IngressTlsInvalidYamlError, id="Broken YAML"),
         pytest.param("{}", IngressTlsNotAListError, id="Empty object"),
         pytest.param('{"key":"value"}', IngressTlsNotAListError, id="Empty object"),
     ],
 )
-def test_ensure_ingress_tls_is_valid_json_fails(
+def test_ensure_ingress_tls_is_valid_yaml_fails(
     ingress_tls_str: str, exception: type[IngressTlsException]
 ) -> None:
     """
     GIVEN an invalid Ingress TLS string
-    WHEN ensuring that it's a valid JSON
+    WHEN ensuring that it's a valid YAML
     THEN raise an exception
     """
     # GIVEN
@@ -297,4 +301,53 @@ def test_ensure_ingress_tls_is_valid_json_fails(
 
     # WHEN
     with pytest.raises(exception):
-        ensure_ingress_tls_is_valid_json(context)
+        ensure_ingress_tls_is_valid_yaml(context)
+
+
+@pytest.mark.parametrize(
+    "deployment_annotations_str",
+    [
+        pytest.param(None, id="No annotations"),
+        pytest.param("", id="Empty string"),
+        pytest.param("  ", id="Empty string with spaces"),
+        pytest.param("{}", id="Empty mapping"),
+        pytest.param('{"key": "value"}', id="Mapping"),
+    ],
+)
+def test_ensure_deployment_annotations_is_valid_yaml(
+    deployment_annotations_str: Optional[str],
+) -> None:
+    """
+    GIVEN a valid Deployment annotations string
+    WHEN ensuring that it's a valid YAML
+    THEN no exception is raised
+    """
+    # GIVEN
+    context = make_context(deployment_annotations_str=deployment_annotations_str)
+
+    # WHEN
+    ensure_deployment_annotations_is_valid_yaml(context)
+
+
+@pytest.mark.parametrize(
+    "deployment_annotations_str, exception",
+    [
+        pytest.param("aaa", DeploymentAnnotationsNotAMappingError, id="Single string"),
+        pytest.param("{", DeploymentAnnotationsInvaliYamlError, id="Broken YAML"),
+        pytest.param("[]", DeploymentAnnotationsNotAMappingError, id="List"),
+    ],
+)
+def test_ensure_deployment_annotations_is_valid_yaml_fails(
+    deployment_annotations_str: str, exception: type[DeploymentAnnotationsException]
+) -> None:
+    """
+    GIVEN an invalid Deployment annotations string
+    WHEN ensuring that it's a valid YAML
+    THEN raise an exception
+    """
+    # GIVEN
+    context = make_context(deployment_annotations_str=deployment_annotations_str)
+
+    # WHEN
+    with pytest.raises(exception):
+        ensure_deployment_annotations_is_valid_yaml(context)

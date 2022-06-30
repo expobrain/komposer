@@ -20,6 +20,7 @@ from tests.fixtures import make_labels
                     metadata=Metadata(
                         name="test-project-test-repository-test-branch-my-service",
                         labels=make_labels(),
+                        annotations=None,
                     ),
                     spec=kubernetes.ServiceSpec(
                         ports=[
@@ -40,6 +41,7 @@ from tests.fixtures import make_labels
                     metadata=Metadata(
                         name="test-project-test-repository-test-branch-my-service",
                         labels=make_labels(),
+                        annotations=None,
                     ),
                     spec=kubernetes.ServiceSpec(
                         ports=[kubernetes.ServicePort(name="8080", port=8080, targetPort=8080)],

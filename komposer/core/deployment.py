@@ -20,7 +20,7 @@ def generate_deployment(
 ) -> kubernetes.Deployment:
     host_aliases = generate_host_aliases(services)
     containers = generate_containers(context, services)
-    metadata = kubernetes.Metadata.from_context_with_name(context)
+    metadata = kubernetes.Metadata.from_context_with_name(context, context.deployment_annotations)
 
     deployment = kubernetes.Deployment(
         metadata=metadata,

@@ -1,6 +1,7 @@
-import json
 from pathlib import Path
 from typing import Any, Optional
+
+import yaml
 
 from komposer.types.base import ImmutableBaseModel
 from komposer.utils import to_kubernetes_name
@@ -15,6 +16,16 @@ class Context(ImmutableBaseModel):
     ingress_for_service: Optional[str] = None
     extra_manifest_path: Optional[Path] = None
     ingress_tls_str: Optional[str] = None
+    deployment_annotations_str: Optional[str] = None
+
+    @staticmethod
+    def __parse_str_as_yaml(value_str: Optional[str]) -> Any:
+        if value_str is None:
+            return None
+
+        value = yaml.safe_load(value_str)
+
+        return value
 
     @property
     def project_name_kubernetes(self) -> str:
@@ -40,13 +51,8 @@ class Context(ImmutableBaseModel):
 
     @property
     def ingress_tls(self) -> Optional[Any]:
-        ingress_tls_str = self.ingress_tls_str
+        return self.__parse_str_as_yaml(self.ingress_tls_str)
 
-        if ingress_tls_str is None:
-            return None
-
-        ingress_tls_str = ingress_tls_str.strip()
-
-        ingress_tls = json.loads(ingress_tls_str)
-
-        return ingress_tls
+    @property
+    def deployment_annotations(self) -> Optional[Any]:
+        return self.__parse_str_as_yaml(self.deployment_annotations_str)

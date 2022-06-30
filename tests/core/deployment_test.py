@@ -1,13 +1,14 @@
 import textwrap
 from pathlib import Path
+from typing import Optional
 
 import pytest
 
 from komposer.core.deployment import generate_deployment
 from komposer.types import docker_compose, kubernetes
 from komposer.types.cli import Context
-from komposer.types.kubernetes import Metadata, UnnamedMetadata
-from tests.fixtures import TEST_IMAGE_NAME, make_labels
+from komposer.types.kubernetes import Annotations, Metadata, UnnamedMetadata
+from tests.fixtures import TEST_IMAGE_NAME, make_context, make_labels
 
 
 @pytest.mark.parametrize(
@@ -254,3 +255,36 @@ def test_generate_deployment_env_file(
 
     # THEN
     assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "services",
+    [{"my_service": docker_compose.Service(command="python run.py", env_file=".env.docker")}],
+)
+@pytest.mark.parametrize(
+    "deployment_annotations_str, expected",
+    [
+        pytest.param(None, None, id="No annotations"),
+        pytest.param('{"key": "value"}', {"key": "value"}, id="Mapping"),
+    ],
+)
+def test_generate_deployment_with_extra_annotations(
+    deployment_annotations_str: Optional[str],
+    services: docker_compose.Services,
+    expected: Annotations,
+) -> None:
+    """
+    GIVEN a Docker Compose services
+        AND a list of extra annotations
+    WHEN generating a deployment
+    THEN a Deployment is returned
+        AND the annotations matches the expected
+    """
+    # GIVEN
+    context = make_context(deployment_annotations_str=deployment_annotations_str)
+
+    # WHEN
+    actual = generate_deployment(context, services)
+
+    # THEN
+    assert actual.metadata.annotations == expected

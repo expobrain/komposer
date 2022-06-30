@@ -34,7 +34,7 @@ class PathType(Enum):
 
 class UnnamedMetadata(CamelCaseImmutableBaseModel):
     labels: Labels = {}
-    annotations: Annotations = {}
+    annotations: Optional[Annotations] = None
 
 
 class Metadata(UnnamedMetadata):
@@ -49,9 +49,7 @@ class Metadata(UnnamedMetadata):
 
     @staticmethod
     def from_context(context: Context, annotations: Optional[Annotations] = None) -> Metadata:
-        return Metadata(
-            labels=Metadata.labels_from_context(context), annotations=annotations or {}
-        )
+        return Metadata(labels=Metadata.labels_from_context(context), annotations=annotations)
 
     @staticmethod
     def from_context_with_suffix(
@@ -60,7 +58,7 @@ class Metadata(UnnamedMetadata):
         name = f"{context.manifest_prefix}-{to_kubernetes_name(suffix)}"
         labels = Metadata.labels_from_context(context)
 
-        return Metadata(name=name, labels=labels, annotations=annotations or {})
+        return Metadata(name=name, labels=labels, annotations=annotations)
 
     @staticmethod
     def from_context_with_name(
@@ -69,7 +67,7 @@ class Metadata(UnnamedMetadata):
         return Metadata(
             name=context.manifest_prefix,
             labels=Metadata.labels_from_context(context),
-            annotations=annotations or {},
+            annotations=annotations,
         )
 
 

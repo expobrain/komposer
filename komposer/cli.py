@@ -64,8 +64,16 @@ def output_manifest(manifest: kubernetes.List) -> None:
     "--ingress-tls-file",
     type=click.Path(file_okay=True, dir_okay=False, resolve_path=True, path_type=Path),
     help=(
-        "Specify the filename containing the Ingress' TLS configuration as a JSON object. "
-        "It's your responsibility to make sure that it's a valid Kubernetes config. "
+        "Specify the filename containing the Ingress' TLS configuration as a YAML list. "
+        "It's your responsibility to make sure that it's a valid Kubernetes config fragment. "
+    ),
+)
+@click.option(
+    "--deployment-annotations-file",
+    type=click.Path(file_okay=True, dir_okay=False, resolve_path=True, path_type=Path),
+    help=(
+        "Specify the filename containing the extra Deployment's annotaions as a YAML object. "
+        "It's your responsibility to make sure that it's a valid Kubernetes config fragment. "
     ),
 )
 def main(
@@ -77,7 +85,13 @@ def main(
     ingress_for_service: Optional[str] = None,
     extra_manifest: Optional[Path] = None,
     ingress_tls_file: Optional[Path] = None,
+    deployment_annotations_file: Optional[Path] = None,
 ) -> None:
+    ingress_tls_str = ingress_tls_file.read_text() if ingress_tls_file else None
+    deployment_annotations_str = (
+        deployment_annotations_file.read_text() if deployment_annotations_file else None
+    )
+
     context = Context(
         docker_compose_path=compose_file,
         project_name=project_name,
@@ -86,7 +100,8 @@ def main(
         default_image=default_image,
         ingress_for_service=ingress_for_service,
         extra_manifest_path=extra_manifest,
-        ingress_tls_str=ingress_tls_file.read_text() if ingress_tls_file else None,
+        ingress_tls_str=ingress_tls_str,
+        deployment_annotations_str=deployment_annotations_str,
     )
 
     manifest_data = generate_manifest_from_docker_compose(context)

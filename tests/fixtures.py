@@ -19,6 +19,7 @@ def make_context(
     ingress_for_service: Optional[str] = None,
     extra_manifest_path: Optional[Path] = None,
     ingress_tls_str: Optional[str] = None,
+    deployment_annotations_str: Optional[str] = None,
 ) -> Context:
     temporary_path = temporary_path or Path()
     extra_manifest_path = extra_manifest_path or Path()
@@ -32,4 +33,5 @@ def make_context(
         ingress_for_service=ingress_for_service,
         extra_manifest_path=extra_manifest_path,
         ingress_tls_str=ingress_tls_str,
+        deployment_annotations_str=deployment_annotations_str,
     )
