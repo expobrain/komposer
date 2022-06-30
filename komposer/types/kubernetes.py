@@ -154,6 +154,7 @@ class Container(CamelCaseImmutableBaseModel):
 
 
 class TemplateSpec(CamelCaseImmutableBaseModel):
+    service_account_name: Optional[str] = None
     host_aliases: list[HostAlias] = []
     containers: list[Container] = []
 

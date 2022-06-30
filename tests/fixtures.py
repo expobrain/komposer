@@ -25,6 +25,7 @@ def make_context(
     extra_manifest_path: Optional[Path] = None,
     ingress_tls_str: Optional[str] = None,
     deployment_annotations_str: Optional[str] = None,
+    deployment_service_account_name: Optional[str] = None,
 ) -> Context:
     temporary_path = temporary_path or Path()
     docker_compose_path = docker_compose_path or (temporary_path / DEFAULT_DOCKER_COMPOSE_FILENAME)
@@ -39,5 +40,8 @@ def make_context(
         ingress_for_service=ingress_for_service,
         extra_manifest_path=extra_manifest_path,
         ingress=IngressContext(tls_str=ingress_tls_str),
-        deployment=DeploymentContext(annotations_str=deployment_annotations_str),
+        deployment=DeploymentContext(
+            annotations_str=deployment_annotations_str,
+            service_account_name=deployment_service_account_name,
+        ),
     )

@@ -18,6 +18,7 @@ def parse_str_as_yaml(value_str: Optional[str]) -> Any:
 
 class DeploymentContext(ImmutableBaseModel):
     annotations_str: Optional[str] = None
+    service_account_name: Optional[str] = None
 
     @property
     def annotations(self) -> Optional[Any]:
