@@ -13,11 +13,11 @@ DEFAULT_PROJECT_NAME = "default"
 DEFAULT_DOCKER_IMAGE = "${IMAGE}"
 
 
-def write_manifest(manifest_path: Path, manifest: kubernetes.List) -> None:
+def output_manifest(manifest: kubernetes.List) -> None:
     content = yaml.safe_load(manifest.json(by_alias=True))
+    output = yaml.safe_dump(content)
 
-    with manifest_path.open("w") as f:
-        yaml.safe_dump(content, f)
+    print(output)
 
 
 @click.command()
@@ -67,12 +67,8 @@ def write_manifest(manifest_path: Path, manifest: kubernetes.List) -> None:
         "It's your responsibility to make sure that it's a valid Kubernetes config."
     ),
 )
-@click.argument(
-    "manifest", type=click.Path(file_okay=True, writable=True, resolve_path=True, path_type=Path)
-)
 def main(
     compose_file: Path,
-    manifest: Path,
     project_name: str,
     repository_name: str,
     branch_name: str,
@@ -83,7 +79,6 @@ def main(
 ) -> None:
     context = Context(
         docker_compose_path=compose_file,
-        kubernetes_manifest_path=manifest,
         project_name=project_name,
         branch_name=branch_name,
         repository_name=repository_name,
@@ -95,7 +90,7 @@ def main(
 
     manifest_data = generate_manifest_from_docker_compose(context)
 
-    write_manifest(manifest, manifest_data)
+    output_manifest(manifest_data)
 
 
 if __name__ == "__main__":

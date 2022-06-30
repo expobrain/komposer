@@ -43,7 +43,6 @@ def test_context_manifest_prefix(
     """
     # WHEN
     context = Context(
-        kubernetes_manifest_path=temporary_path,
         docker_compose_path=temporary_path,
         project_name=project_name,
         branch_name=branch_name,
