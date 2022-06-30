@@ -6,7 +6,7 @@ import yaml
 
 from komposer.core.base import generate_manifest_from_docker_compose
 from komposer.types import kubernetes
-from komposer.types.cli import Context
+from komposer.types.cli import Context, DeploymentContext, IngressContext
 
 DEFAULT_DOCKER_COMPOSE_FILENAME = Path("docker-compose.yml")
 DEFAULT_PROJECT_NAME = "default"
@@ -100,8 +100,8 @@ def main(
         default_image=default_image,
         ingress_for_service=ingress_for_service,
         extra_manifest_path=extra_manifest,
-        ingress_tls_str=ingress_tls_str,
-        deployment_annotations_str=deployment_annotations_str,
+        ingress=IngressContext(tls_str=ingress_tls_str),
+        deployment=DeploymentContext(annotations_str=deployment_annotations_str),
     )
 
     manifest_data = generate_manifest_from_docker_compose(context)

@@ -2,8 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from komposer.types.cli import Context
-from tests.fixtures import TEST_IMAGE_NAME
+from tests.fixtures import make_context
 
 
 @pytest.mark.parametrize(
@@ -42,12 +41,11 @@ def test_context_manifest_prefix(
     THEN is the expected
     """
     # WHEN
-    context = Context(
+    context = make_context(
         docker_compose_path=temporary_path,
         project_name=project_name,
         branch_name=branch_name,
         repository_name=repository_name,
-        default_image=TEST_IMAGE_NAME,
     )
 
     # THEN
