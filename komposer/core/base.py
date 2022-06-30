@@ -57,7 +57,7 @@ def ensure_unique_ports_on_docker_compose(compose: docker_compose.DockerCompose)
 
 def ensure_ingress_tls_is_valid_yaml(context: Context) -> None:
     try:
-        ingress_tls = context.ingress_tls
+        ingress_tls = context.ingress.tls
     except ParserError:
         raise IngressTlsInvalidYamlError("The Ingress TLS value is not a valid YAML")
 
@@ -70,7 +70,7 @@ def ensure_ingress_tls_is_valid_yaml(context: Context) -> None:
 
 def ensure_deployment_annotations_is_valid_yaml(context: Context) -> None:
     try:
-        deployment_annotations = context.deployment_annotations
+        deployment_annotations = context.deployment.annotations
     except ParserError:
         raise DeploymentAnnotationsInvaliYamlError(
             "The Deployment annotations value is not a valid YAML"

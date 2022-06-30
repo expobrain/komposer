@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Optional
 
 from komposer.cli import DEFAULT_DOCKER_COMPOSE_FILENAME
-from komposer.types.cli import Context
+from komposer.types.cli import Context, DeploymentContext, IngressContext
 
 TEST_IMAGE_NAME = "test-image"
 TEST_PROJECT_NAME = "test-project"
@@ -16,22 +16,28 @@ def make_labels() -> dict[str, str]:
 
 def make_context(
     temporary_path: Optional[Path] = None,
+    docker_compose_path: Optional[Path] = None,
+    project_name: str = TEST_PROJECT_NAME,
+    branch_name: str = TEST_BRANCH_NAME,
+    repository_name: str = TEST_REPOSITORY_NAME,
+    default_image: str = TEST_IMAGE_NAME,
     ingress_for_service: Optional[str] = None,
     extra_manifest_path: Optional[Path] = None,
     ingress_tls_str: Optional[str] = None,
     deployment_annotations_str: Optional[str] = None,
 ) -> Context:
     temporary_path = temporary_path or Path()
+    docker_compose_path = docker_compose_path or (temporary_path / DEFAULT_DOCKER_COMPOSE_FILENAME)
     extra_manifest_path = extra_manifest_path or Path()
 
     return Context(
-        docker_compose_path=temporary_path / DEFAULT_DOCKER_COMPOSE_FILENAME,
-        project_name=TEST_PROJECT_NAME,
-        branch_name=TEST_BRANCH_NAME,
-        repository_name=TEST_REPOSITORY_NAME,
-        default_image=TEST_IMAGE_NAME,
+        docker_compose_path=docker_compose_path,
+        project_name=project_name,
+        branch_name=branch_name,
+        repository_name=repository_name,
+        default_image=default_image,
         ingress_for_service=ingress_for_service,
         extra_manifest_path=extra_manifest_path,
-        ingress_tls_str=ingress_tls_str,
-        deployment_annotations_str=deployment_annotations_str,
+        ingress=IngressContext(tls_str=ingress_tls_str),
+        deployment=DeploymentContext(annotations_str=deployment_annotations_str),
     )

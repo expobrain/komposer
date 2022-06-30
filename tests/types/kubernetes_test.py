@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pytest
 
 from komposer.types.cli import Context
@@ -12,12 +10,7 @@ from komposer.types.kubernetes import (
     ServiceRefPort,
 )
 from komposer.utils import to_kubernetes_name
-from tests.fixtures import (
-    TEST_BRANCH_NAME,
-    TEST_IMAGE_NAME,
-    TEST_PROJECT_NAME,
-    TEST_REPOSITORY_NAME,
-)
+from tests.fixtures import TEST_BRANCH_NAME, TEST_REPOSITORY_NAME, make_context
 
 
 @pytest.mark.parametrize(
@@ -125,13 +118,7 @@ def test_service_ref_port_from_string(string: str, expected: ServiceRefPort) -> 
     "context, expected",
     [
         pytest.param(
-            Context(
-                docker_compose_path=Path(),
-                project_name=TEST_PROJECT_NAME,
-                branch_name=TEST_BRANCH_NAME,
-                repository_name=TEST_REPOSITORY_NAME,
-                default_image=TEST_IMAGE_NAME,
-            ),
+            make_context(),
             {
                 "repository": to_kubernetes_name(TEST_REPOSITORY_NAME),
                 "branch": to_kubernetes_name(TEST_BRANCH_NAME),
@@ -139,12 +126,8 @@ def test_service_ref_port_from_string(string: str, expected: ServiceRefPort) -> 
             id="Default values",
         ),
         pytest.param(
-            Context(
-                docker_compose_path=Path(),
-                project_name=TEST_PROJECT_NAME,
-                branch_name=TEST_BRANCH_NAME.upper(),
-                repository_name=TEST_REPOSITORY_NAME.upper(),
-                default_image=TEST_IMAGE_NAME,
+            make_context(
+                branch_name=TEST_BRANCH_NAME.upper(), repository_name=TEST_REPOSITORY_NAME.upper()
             ),
             {
                 "repository": to_kubernetes_name(TEST_REPOSITORY_NAME),
@@ -153,13 +136,7 @@ def test_service_ref_port_from_string(string: str, expected: ServiceRefPort) -> 
             id="Default uppercase values",
         ),
         pytest.param(
-            Context(
-                docker_compose_path=Path(),
-                project_name=TEST_PROJECT_NAME,
-                branch_name="my/branch",
-                repository_name="my/repository",
-                default_image=TEST_IMAGE_NAME,
-            ),
+            make_context(branch_name="my/branch", repository_name="my/repository"),
             {
                 "repository": "my-repository",
                 "branch": "my-branch",
