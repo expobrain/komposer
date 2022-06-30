@@ -7,7 +7,6 @@ from komposer.utils import to_kubernetes_name
 
 
 class Context(ImmutableBaseModel):
-    kubernetes_manifest_path: Path
     docker_compose_path: Path
     project_name: str
     branch_name: str

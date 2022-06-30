@@ -25,7 +25,6 @@ def make_context(
 
     return Context(
         docker_compose_path=temporary_path / DEFAULT_DOCKER_COMPOSE_FILENAME,
-        kubernetes_manifest_path=temporary_path / "manifest.yaml",
         project_name=TEST_PROJECT_NAME,
         branch_name=TEST_BRANCH_NAME,
         repository_name=TEST_REPOSITORY_NAME,

@@ -126,7 +126,6 @@ def test_service_ref_port_from_string(string: str, expected: ServiceRefPort) -> 
     [
         pytest.param(
             Context(
-                kubernetes_manifest_path=Path(),
                 docker_compose_path=Path(),
                 project_name=TEST_PROJECT_NAME,
                 branch_name=TEST_BRANCH_NAME,
@@ -141,7 +140,6 @@ def test_service_ref_port_from_string(string: str, expected: ServiceRefPort) -> 
         ),
         pytest.param(
             Context(
-                kubernetes_manifest_path=Path(),
                 docker_compose_path=Path(),
                 project_name=TEST_PROJECT_NAME,
                 branch_name=TEST_BRANCH_NAME.upper(),
@@ -156,7 +154,6 @@ def test_service_ref_port_from_string(string: str, expected: ServiceRefPort) -> 
         ),
         pytest.param(
             Context(
-                kubernetes_manifest_path=Path(),
                 docker_compose_path=Path(),
                 project_name=TEST_PROJECT_NAME,
                 branch_name="my/branch",
