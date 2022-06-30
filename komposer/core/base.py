@@ -1,5 +1,6 @@
 import re
-from json import JSONDecodeError
+
+from yaml.parser import ParserError
 
 from komposer.core.config_map import generate_config_maps
 from komposer.core.deployment import generate_deployment
@@ -8,7 +9,9 @@ from komposer.core.ingress import generate_ingress_from_services
 from komposer.core.service import generate_services
 from komposer.exceptions import (
     ComposePortsNotUniqueError,
-    IngressTlsInvalidJsonError,
+    DeploymentAnnotationsInvaliYamlError,
+    DeploymentAnnotationsNotAMappingError,
+    IngressTlsInvalidYamlError,
     IngressTlsNotAListError,
     InvalidServiceNameError,
 )
@@ -52,11 +55,11 @@ def ensure_unique_ports_on_docker_compose(compose: docker_compose.DockerCompose)
         raise ComposePortsNotUniqueError(f"Non-unique ports detected: {non_unique_ports}")
 
 
-def ensure_ingress_tls_is_valid_json(context: Context) -> None:
+def ensure_ingress_tls_is_valid_yaml(context: Context) -> None:
     try:
         ingress_tls = context.ingress_tls
-    except JSONDecodeError:
-        raise IngressTlsInvalidJsonError("The Ingress TLS value is not a valid JSON")
+    except ParserError:
+        raise IngressTlsInvalidYamlError("The Ingress TLS value is not a valid YAML")
 
     if ingress_tls is None:
         return
@@ -65,12 +68,30 @@ def ensure_ingress_tls_is_valid_json(context: Context) -> None:
         raise IngressTlsNotAListError("The Ingress TLS value is not a list")
 
 
+def ensure_deployment_annotations_is_valid_yaml(context: Context) -> None:
+    try:
+        deployment_annotations = context.deployment_annotations
+    except ParserError:
+        raise DeploymentAnnotationsInvaliYamlError(
+            "The Deployment annotations value is not a valid YAML"
+        )
+
+    if deployment_annotations is None:
+        return
+
+    if not isinstance(deployment_annotations, dict):
+        raise DeploymentAnnotationsNotAMappingError(
+            "The Deployment annotations value is not a mapping"
+        )
+
+
 def generate_manifest_from_docker_compose(context: Context) -> kubernetes.List:
     # Parse docker compose file
     compose = parse_docker_compose_file(context.docker_compose_path)
 
     # Ensures Docker Compose is supported
-    ensure_ingress_tls_is_valid_json(context)
+    ensure_deployment_annotations_is_valid_yaml(context)
+    ensure_ingress_tls_is_valid_yaml(context)
     ensure_unique_ports_on_docker_compose(compose)
     ensure_service_name_lowercase_RFC_1123(compose)
 

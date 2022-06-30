@@ -6,6 +6,10 @@ class IngressTlsException(KomposerException):
     pass
 
 
+class DeploymentAnnotationsException(KomposerException):
+    pass
+
+
 class ServiceNotFoundError(KomposerException):
     pass
 
@@ -18,9 +22,17 @@ class InvalidServiceNameError(KomposerException):
     pass
 
 
-class IngressTlsInvalidJsonError(IngressTlsException):
+class IngressTlsInvalidYamlError(IngressTlsException):
     pass
 
 
 class IngressTlsNotAListError(IngressTlsException):
+    pass
+
+
+class DeploymentAnnotationsInvaliYamlError(DeploymentAnnotationsException):
+    pass
+
+
+class DeploymentAnnotationsNotAMappingError(DeploymentAnnotationsException):
     pass

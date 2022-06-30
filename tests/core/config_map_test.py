@@ -98,6 +98,7 @@ def test_generate_config_map_from_file(
                     metadata=Metadata(
                         name="test-project-test-repository-test-branch-my-service",
                         labels=make_labels(),
+                        annotations=None,
                     ),
                     data={"MY_VARIABLE": "my-value"},
                 )
@@ -117,6 +118,7 @@ def test_generate_config_map_from_file(
                     metadata=Metadata(
                         name="test-project-test-repository-test-branch-my-service",
                         labels=make_labels(),
+                        annotations=None,
                     ),
                     data={"MY_VARIABLE_1": "my-value-1", "MY_VARIABLE_2": "my-value-2"},
                 )
@@ -132,6 +134,7 @@ def test_generate_config_map_from_file(
                     metadata=Metadata(
                         name="test-project-test-repository-test-branch-my-service",
                         labels=make_labels(),
+                        annotations=None,
                     ),
                     data={"MY_VARIABLE": None},
                 )
@@ -147,6 +150,7 @@ def test_generate_config_map_from_file(
                     metadata=Metadata(
                         name="test-project-test-repository-test-branch-my-service",
                         labels=make_labels(),
+                        annotations=None,
                     ),
                     data={"MY_VARIABLE": ""},
                 )
@@ -162,6 +166,7 @@ def test_generate_config_map_from_file(
                     metadata=Metadata(
                         name="test-project-test-repository-test-branch-my-service",
                         labels=make_labels(),
+                        annotations=None,
                     ),
                     data={"MY_VARIABLE": None},
                 )
