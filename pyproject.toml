@@ -14,7 +14,7 @@ skip_glob = ".venv"
 
 [tool.poetry]
 name = "komposer"
-version = "0.1.0dev6"
+version = "0.1.0dev7"
 description = "Tool to convert a Docker Compose file into a Kubernetes manifest"
 repository = "https://github.com/expobrain/komposer"
 authors = ["Daniele Esposti <daniele.esposti@gmail.com>"]

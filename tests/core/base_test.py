@@ -22,6 +22,7 @@ from komposer.exceptions import (
 )
 from komposer.types import docker_compose, kubernetes
 from komposer.types.cli import Context
+from komposer.utils import as_json_object
 from tests.fixtures import make_context, make_labels
 
 
@@ -31,7 +32,7 @@ def make_minimal_docker_compose() -> docker_compose.DockerCompose:
 
 def make_minimal_service() -> kubernetes.Service:
     return kubernetes.Service(
-        apiversion="v1",
+        apiVersion="v1",
         kind="Service",
         metadata=kubernetes.Metadata(
             name="test-project-test-repository-test-branch-my-service", labels=make_labels()
@@ -42,7 +43,7 @@ def make_minimal_service() -> kubernetes.Service:
 
 def make_minimal_deployment() -> kubernetes.Deployment:
     return kubernetes.Deployment(
-        apiversion="v1",
+        apiVersion="apps/v1",
         kind="Deployment",
         metadata=kubernetes.Metadata(
             name="test-project-test-repository-test-branch", labels=make_labels()
@@ -103,6 +104,57 @@ def make_minimal_ingress() -> kubernetes.Ingress:
             ],
         ),
     )
+
+
+def make_minimal_extra_manifest_items() -> list[dict]:
+    return [
+        {
+            "apiVersion": "v1",
+            "kind": "ConfigMap",
+            "metadata": {
+                "name": "my-config-map",
+            },
+            "data": {
+                "DEBUG": "1",
+            },
+        },
+        {
+            "apiVersion": "batch/v1",
+            "kind": "Job",
+            "metadata": {
+                "name": "my-job",
+                "labels": {
+                    "my-lable": "my-label-value",
+                },
+            },
+            "spec": {
+                "template": {
+                    "spec": {
+                        "restartPolicy": "OnFailure",
+                        "containers": [
+                            {
+                                "name": "my-container",
+                                "imagePullPolicy": "IfNotPresent",
+                                "image": "${IMAGE}",
+                                "args": ["python", "run.py"],
+                                "env": [
+                                    {
+                                        "name": "DEBUG",
+                                        "valueFrom": {
+                                            "configMapKeyRef": {
+                                                "key": "DEBUG",
+                                                "name": "my-config-map",
+                                            }
+                                        },
+                                    },
+                                ],
+                            }
+                        ],
+                    }
+                },
+            },
+        },
+    ]
 
 
 @pytest.mark.parametrize(
@@ -187,7 +239,7 @@ def test_ensure_service_name_lowercase_RFC_1123_fails(
 
 
 @pytest.mark.parametrize(
-    "context, compose, config_maps, deployment, services, external_items, expected",
+    "context, compose, config_maps, deployment, services, extra_manifest, expected",
     [
         pytest.param(
             make_context(),
@@ -196,12 +248,14 @@ def test_ensure_service_name_lowercase_RFC_1123_fails(
             make_minimal_deployment(),
             [make_minimal_service()],
             [],
-            kubernetes.List(
-                items=[
-                    make_minimal_deployment(),
-                    make_minimal_service(),
-                ]
-            ),
+            {
+                "apiVersion": "v1",
+                "kind": "List",
+                "items": [
+                    as_json_object(make_minimal_deployment()),
+                    as_json_object(make_minimal_service()),
+                ],
+            },
             id="Single service",
         ),
         pytest.param(
@@ -211,14 +265,34 @@ def test_ensure_service_name_lowercase_RFC_1123_fails(
             make_minimal_deployment(),
             [make_minimal_service()],
             [],
-            kubernetes.List(
-                items=[
-                    make_minimal_deployment(),
-                    make_minimal_service(),
-                    make_minimal_ingress(),
-                ]
-            ),
+            {
+                "apiVersion": "v1",
+                "kind": "List",
+                "items": [
+                    as_json_object(make_minimal_deployment()),
+                    as_json_object(make_minimal_service()),
+                    as_json_object(make_minimal_ingress()),
+                ],
+            },
             id="Single service with ingress",
+        ),
+        pytest.param(
+            make_context(extra_manifest_path="my-service"),
+            make_minimal_docker_compose(),
+            [],
+            make_minimal_deployment(),
+            [make_minimal_service()],
+            make_minimal_extra_manifest_items(),
+            {
+                "apiVersion": "v1",
+                "kind": "List",
+                "items": [
+                    as_json_object(make_minimal_deployment()),
+                    as_json_object(make_minimal_service()),
+                    *make_minimal_extra_manifest_items(),
+                ],
+            },
+            id="Single service with extra manifest",
         ),
     ],
 )
@@ -229,8 +303,8 @@ def test_generate_manifest_from_docker_compose(
     config_maps: Sequence[kubernetes.ConfigMap],
     deployment: kubernetes.Deployment,
     services: Sequence[kubernetes.Service],
-    external_items: kubernetes.List,
-    expected: kubernetes.List,
+    extra_manifest: list[dict],
+    expected: dict,
 ) -> None:
     """
     GIVEN a Docker Compose file
@@ -242,7 +316,7 @@ def test_generate_manifest_from_docker_compose(
     mocker.patch("komposer.core.base.generate_config_maps", return_value=config_maps)
     mocker.patch("komposer.core.base.generate_deployment", return_value=deployment)
     mocker.patch("komposer.core.base.generate_services", return_value=services)
-    mocker.patch("komposer.core.base.load_extra_manifest", return_value=external_items)
+    mocker.patch("komposer.core.base.load_extra_manifest", return_value=extra_manifest)
 
     if context.ingress_for_service:
         mocker.patch(
@@ -254,7 +328,7 @@ def test_generate_manifest_from_docker_compose(
     actual = generate_manifest_from_docker_compose(context)
 
     # THEN
-    assert actual.dict() == expected.dict()
+    assert actual == expected
 
 
 @pytest.mark.parametrize(
