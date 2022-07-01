@@ -5,7 +5,6 @@ import click
 import yaml
 
 from komposer.core.base import generate_manifest_from_docker_compose
-from komposer.types import kubernetes
 from komposer.types.cli import Context, DeploymentContext, IngressContext
 
 DEFAULT_DOCKER_COMPOSE_FILENAME = Path("docker-compose.yml")
@@ -13,9 +12,8 @@ DEFAULT_PROJECT_NAME = "default"
 DEFAULT_DOCKER_IMAGE = "${IMAGE}"
 
 
-def output_manifest(manifest: kubernetes.List) -> None:
-    content = yaml.safe_load(manifest.json(by_alias=True))
-    output = yaml.safe_dump(content)
+def output_raw_manifest(manifest: dict) -> None:
+    output = yaml.safe_dump(manifest)
 
     print(output)
 
@@ -113,7 +111,7 @@ def main(
 
     manifest_data = generate_manifest_from_docker_compose(context)
 
-    output_manifest(manifest_data)
+    output_raw_manifest(manifest_data)
 
 
 if __name__ == "__main__":

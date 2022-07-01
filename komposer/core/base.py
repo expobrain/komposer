@@ -18,7 +18,7 @@ from komposer.exceptions import (
 from komposer.types import docker_compose, kubernetes
 from komposer.types.cli import Context
 from komposer.types.ports import Ports
-from komposer.utils import parse_docker_compose_file
+from komposer.utils import as_json_object, parse_docker_compose_file
 
 rfc_1123_re = re.compile(r"^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$")
 
@@ -85,7 +85,7 @@ def ensure_deployment_annotations_is_valid_yaml(context: Context) -> None:
         )
 
 
-def generate_manifest_from_docker_compose(context: Context) -> kubernetes.List:
+def generate_manifest_from_docker_compose(context: Context) -> dict:
     # Parse docker compose file
     compose = parse_docker_compose_file(context.docker_compose_path)
 
@@ -108,12 +108,18 @@ def generate_manifest_from_docker_compose(context: Context) -> kubernetes.List:
     ingress = generate_ingress_from_services(context, compose.services)
 
     # Load external manifest
-    external_items = load_extra_manifest(context)
+    extra_manifest = load_extra_manifest(context)
 
     # Return manifest
-    items = [*config_maps, deployment, *services, *external_items]
+    items = [*config_maps, deployment, *services]
 
     if ingress:
         items.append(ingress)
 
-    return kubernetes.List(items=items)
+    manifest = kubernetes.List(items=items)
+
+    # Convert to JSON object so that we can append the extra manifest as is
+    manifest_dict = as_json_object(manifest)
+    manifest_dict["items"].extend(extra_manifest)
+
+    return manifest_dict

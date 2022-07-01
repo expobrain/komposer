@@ -256,7 +256,6 @@ class Ingress(Item):
 
 class List(CamelCaseImmutableBaseModel):
     api_version: Literal["v1"] = "v1"
-    # We should be able to use Field(..., discriminator="kind") here
     kind: Literal["List"] = "List"
-    # We allow simple dicts because we want to support Kubernetes items not yet defined
-    items: list[Union[Item, dict]] = []
+    # We should be able to use Field(..., discriminator="kind") here
+    items: list[Item] = []

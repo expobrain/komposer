@@ -131,7 +131,7 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
     ],
 )
 def test_load_external_manifest(
-    context_with_extra_manifest: Context, extra_manifest: list[dict], expected: list[dict]
+    context_with_extra_manifest: Context, extra_manifest: dict, expected: list[dict]
 ) -> None:
     """
     GIVEN a context with an extra manifest
