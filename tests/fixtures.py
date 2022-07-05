@@ -22,8 +22,8 @@ def make_context(
     default_image: str = DEFAULT_DOCKER_IMAGE,
     ingress_for_service: Optional[str] = None,
     extra_manifest_path: Optional[Path] = None,
-    ingress_tls_str: Optional[str] = None,
-    deployment_annotations_str: Optional[str] = None,
+    ingress_tls_path: Optional[Path] = None,
+    deployment_annotations_path: Optional[Path] = None,
     deployment_service_account_name: Optional[str] = None,
 ) -> Context:
     temporary_path = temporary_path or Path()
@@ -38,9 +38,9 @@ def make_context(
         default_image=default_image,
         ingress_for_service=ingress_for_service,
         extra_manifest_path=extra_manifest_path,
-        ingress=IngressContext(tls_str=ingress_tls_str),
+        ingress=IngressContext(tls_path=ingress_tls_path),
         deployment=DeploymentContext(
-            annotations_str=deployment_annotations_str,
+            annotations_path=deployment_annotations_path,
             service_account_name=deployment_service_account_name,
         ),
     )

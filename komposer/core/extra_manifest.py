@@ -1,12 +1,12 @@
 import itertools
 from typing import Literal
 
-import yaml
 from pydantic import parse_obj_as
 
 from komposer.types import kubernetes
 from komposer.types.base import CamelCaseImmutableBaseModel
 from komposer.types.cli import Context
+from komposer.utils import load_yaml
 
 
 class ExtraManifest(CamelCaseImmutableBaseModel):
@@ -38,7 +38,7 @@ def load_extra_manifest(context: Context) -> list[dict]:
         return []
 
     # Parse manifest
-    extra_manifest_raw = yaml.safe_load(context.extra_manifest_path.open())
+    extra_manifest_raw = load_yaml(context.extra_manifest_path)
 
     # just validate that the format of the file
     parse_obj_as(ExtraManifest, extra_manifest_raw)

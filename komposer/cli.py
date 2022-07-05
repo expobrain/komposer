@@ -89,11 +89,6 @@ def main(
     deployment_annotations_file: Optional[Path] = None,
     deployment_service_account_name: Optional[Path] = None,
 ) -> None:
-    ingress_tls_str = ingress_tls_file.read_text() if ingress_tls_file else None
-    deployment_annotations_str = (
-        deployment_annotations_file.read_text() if deployment_annotations_file else None
-    )
-
     context = Context(
         docker_compose_path=compose_file,
         project_name=project_name,
@@ -102,9 +97,9 @@ def main(
         default_image=default_image,
         ingress_for_service=ingress_for_service,
         extra_manifest_path=extra_manifest,
-        ingress=IngressContext(tls_str=ingress_tls_str),
+        ingress=IngressContext(tls_path=ingress_tls_file),
         deployment=DeploymentContext(
-            annotations_str=deployment_annotations_str,
+            annotations_path=deployment_annotations_file,
             service_account_name=deployment_service_account_name,
         ),
     )

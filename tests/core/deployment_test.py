@@ -263,14 +263,14 @@ def test_generate_deployment_env_file(
     [{"my_service": docker_compose.Service(command="python run.py")}],
 )
 @pytest.mark.parametrize(
-    "deployment_annotations_str, expected",
+    "deployment_annotations, expected",
     [
-        pytest.param(None, None, id="No annotations"),
         pytest.param('{"key": "value"}', {"key": "value"}, id="Mapping"),
     ],
 )
 def test_generate_deployment_with_extra_annotations(
-    deployment_annotations_str: Optional[str],
+    temporary_path: Path,
+    deployment_annotations: str,
     services: docker_compose.Services,
     expected: Annotations,
 ) -> None:
@@ -282,7 +282,10 @@ def test_generate_deployment_with_extra_annotations(
         AND the annotations matches the expected
     """
     # GIVEN
-    context = make_context(deployment_annotations_str=deployment_annotations_str)
+    deployment_annotations_path = temporary_path / "deployment_annotations.yaml"
+    deployment_annotations_path.write_text(deployment_annotations)
+
+    context = make_context(deployment_annotations_path=deployment_annotations_path)
 
     # WHEN
     actual = generate_deployment(context, services)

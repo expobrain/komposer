@@ -1,4 +1,8 @@
+from pathlib import Path
+from typing import Any, Optional
+
 import pytest
+import yaml
 
 from komposer.core.ingress import generate_ingress_from_services
 from komposer.exceptions import ServiceNotFoundError
@@ -9,11 +13,71 @@ from tests.fixtures import make_context, make_labels
 
 
 @pytest.mark.parametrize(
-    "context_with_ingress, services, expected",
+    "services, ingress_tls, expected",
     [
         pytest.param(
-            make_context(ingress_for_service="my_service"),
+            {"my_service": docker_compose.Service(command="python run.py")},
+            None,
+            kubernetes.Ingress(
+                metadata=Metadata(
+                    name="test-project-test-repository-test-branch-my-service",
+                    labels=make_labels(),
+                    annotations={"cert-manager.io/cluster-issuer": "letsencrypt-prod"},
+                ),
+                spec=kubernetes.IngressSpec(
+                    tls=None,
+                    rules=[
+                        IngressRule(
+                            host=(
+                                "my-service"
+                                ".test-project-test-repository-test-branch"
+                                ".svc.cluster.local"
+                            ),
+                            http=kubernetes.HttpPaths(paths=[]),
+                        )
+                    ],
+                ),
+            ),
+            id="Service without ingress TLS",
+        ),
+        pytest.param(
+            {"my_service": docker_compose.Service(command="python run.py")},
+            [
+                {
+                    "hosts": ["api.test-repository-test-branch.svc.cluster.local"],
+                    "secretName": "app-tls-cert",
+                }
+            ],
+            kubernetes.Ingress(
+                metadata=Metadata(
+                    name="test-project-test-repository-test-branch-my-service",
+                    labels=make_labels(),
+                    annotations={"cert-manager.io/cluster-issuer": "letsencrypt-prod"},
+                ),
+                spec=kubernetes.IngressSpec(
+                    tls=[
+                        {
+                            "hosts": ["api.test-repository-test-branch.svc.cluster.local"],
+                            "secretName": "app-tls-cert",
+                        }
+                    ],
+                    rules=[
+                        IngressRule(
+                            host=(
+                                "my-service"
+                                ".test-project-test-repository-test-branch"
+                                ".svc.cluster.local"
+                            ),
+                            http=kubernetes.HttpPaths(paths=[]),
+                        )
+                    ],
+                ),
+            ),
+            id="Service with ingress TLS",
+        ),
+        pytest.param(
             {"my_service": docker_compose.Service(command="python run.py", ports=["8080"])},
+            None,
             kubernetes.Ingress(
                 metadata=Metadata(
                     name="test-project-test-repository-test-branch-my-service",
@@ -47,57 +111,11 @@ from tests.fixtures import make_context, make_labels
                     ],
                 ),
             ),
-            id="Service with single port without ingress TLS",
+            id="Service with single port",
         ),
         pytest.param(
-            make_context(
-                ingress_for_service="my_service",
-                ingress_tls_str='[{"hosts": ["api.test-repository-test-branch.svc.cluster.local"], "secretName": "app-tls-cert"}]',  # noqa: E501
-            ),
-            {"my_service": docker_compose.Service(command="python run.py", ports=["8080"])},
-            kubernetes.Ingress(
-                metadata=Metadata(
-                    name="test-project-test-repository-test-branch-my-service",
-                    labels=make_labels(),
-                    annotations={"cert-manager.io/cluster-issuer": "letsencrypt-prod"},
-                ),
-                spec=kubernetes.IngressSpec(
-                    tls=[
-                        {
-                            "hosts": ["api.test-repository-test-branch.svc.cluster.local"],
-                            "secretName": "app-tls-cert",
-                        }
-                    ],
-                    rules=[
-                        IngressRule(
-                            host=(
-                                "my-service"
-                                ".test-project-test-repository-test-branch"
-                                ".svc.cluster.local"
-                            ),
-                            http=kubernetes.HttpPaths(
-                                paths=[
-                                    kubernetes.HttpPath(
-                                        path="/",
-                                        pathType=kubernetes.PathType.PREFIX,
-                                        backend=kubernetes.Backend(
-                                            service=kubernetes.ServiceRef(
-                                                name="test-project-test-repository-test-branch-my-service",  # noqa: E501
-                                                port=kubernetes.ServiceRefPort(number=8080),
-                                            )
-                                        ),
-                                    )
-                                ]
-                            ),
-                        )
-                    ],
-                ),
-            ),
-            id="Service with single port with ingress TLS",
-        ),
-        pytest.param(
-            make_context(ingress_for_service="my_service"),
             {"my_service": docker_compose.Service(command="python run.py", ports=["8080:9000"])},
+            None,
             kubernetes.Ingress(
                 metadata=Metadata(
                     name="test-project-test-repository-test-branch-my-service",
@@ -136,7 +154,10 @@ from tests.fixtures import make_context, make_labels
     ],
 )
 def test_generate_ingress_from_service(
-    context_with_ingress: Context, services: docker_compose.Services, expected: kubernetes.Ingress
+    temporary_path: Path,
+    services: docker_compose.Services,
+    ingress_tls: Optional[list[dict[str, Any]]],
+    expected: kubernetes.Ingress,
 ) -> None:
     """
     GIVEN a Docker Compose services
@@ -144,8 +165,17 @@ def test_generate_ingress_from_service(
     WHEN generating the ingress
     THEN Kubernetes ingress is returned
     """
+    # GIVEN
+    if ingress_tls is not None:
+        ingress_tls_path = temporary_path / "ingress_tls.yaml"
+        ingress_tls_path.write_text(yaml.safe_dump(ingress_tls))
+    else:
+        ingress_tls_path = None
+
+    context = make_context(ingress_for_service="my_service", ingress_tls_path=ingress_tls_path)
+
     # WHEN
-    actual = generate_ingress_from_services(context_with_ingress, services)
+    actual = generate_ingress_from_services(context, services)
 
     # THEN
     assert actual == expected

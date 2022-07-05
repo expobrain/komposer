@@ -1,4 +1,5 @@
-from typing import Optional, Sequence
+from pathlib import Path
+from typing import Sequence
 
 import pytest
 from pytest_mock import MockerFixture
@@ -332,29 +333,44 @@ def test_generate_manifest_from_docker_compose(
 
 
 @pytest.mark.parametrize(
-    "ingress_tls_str",
+    "ingress_tls",
     [
-        pytest.param(None, id="No TLS"),
         pytest.param("[]", id="List"),
         pytest.param("", id="Empty string"),
         pytest.param("  ", id="Empty string with spaces"),
     ],
 )
-def test_ensure_ingress_tls_is_valid_yaml(ingress_tls_str: Optional[str]) -> None:
+def test_ensure_ingress_tls_is_valid_yaml(temporary_path: Path, ingress_tls: str) -> None:
     """
     GIVEN a valid Ingress TLS string
     WHEN ensuring that it's a valid YAML
     THEN no exception is raised
     """
     # GIVEN
-    context = make_context(ingress_tls_str=ingress_tls_str)
+    ingress_tls_path = temporary_path / "ingress_tls.yaml"
+    ingress_tls_path.write_text(ingress_tls)
+
+    context = make_context(ingress_tls_path=ingress_tls_path)
+
+    # WHEN
+    ensure_ingress_tls_is_valid_yaml(context)
+
+
+def test_ensure_ingress_tls_is_valid_yaml_if_not_set() -> None:
+    """
+    GIVEN a valid Ingress TLS string is not set
+    WHEN ensuring that it's a valid YAML
+    THEN no exception is raised
+    """
+    # GIVEN
+    context = make_context(ingress_tls_path=None)
 
     # WHEN
     ensure_ingress_tls_is_valid_yaml(context)
 
 
 @pytest.mark.parametrize(
-    "ingress_tls_str, exception",
+    "ingress_tls, exception",
     [
         pytest.param("aaa", IngressTlsNotAListError, id="Single string"),
         pytest.param("{", IngressTlsInvalidYamlError, id="Broken YAML"),
@@ -363,7 +379,7 @@ def test_ensure_ingress_tls_is_valid_yaml(ingress_tls_str: Optional[str]) -> Non
     ],
 )
 def test_ensure_ingress_tls_is_valid_yaml_fails(
-    ingress_tls_str: str, exception: type[IngressTlsException]
+    temporary_path: Path, ingress_tls: str, exception: type[IngressTlsException]
 ) -> None:
     """
     GIVEN an invalid Ingress TLS string
@@ -371,7 +387,10 @@ def test_ensure_ingress_tls_is_valid_yaml_fails(
     THEN raise an exception
     """
     # GIVEN
-    context = make_context(ingress_tls_str=ingress_tls_str)
+    ingress_tls_path = temporary_path / "ingress_tls.yaml"
+    ingress_tls_path.write_text(ingress_tls)
+
+    context = make_context(ingress_tls_path=ingress_tls_path)
 
     # WHEN
     with pytest.raises(exception):
@@ -379,9 +398,8 @@ def test_ensure_ingress_tls_is_valid_yaml_fails(
 
 
 @pytest.mark.parametrize(
-    "deployment_annotations_str",
+    "deployment_annotations",
     [
-        pytest.param(None, id="No annotations"),
         pytest.param("", id="Empty string"),
         pytest.param("  ", id="Empty string with spaces"),
         pytest.param("{}", id="Empty mapping"),
@@ -389,7 +407,7 @@ def test_ensure_ingress_tls_is_valid_yaml_fails(
     ],
 )
 def test_ensure_deployment_annotations_is_valid_yaml(
-    deployment_annotations_str: Optional[str],
+    temporary_path: Path, deployment_annotations: str
 ) -> None:
     """
     GIVEN a valid Deployment annotations string
@@ -397,14 +415,30 @@ def test_ensure_deployment_annotations_is_valid_yaml(
     THEN no exception is raised
     """
     # GIVEN
-    context = make_context(deployment_annotations_str=deployment_annotations_str)
+    deployment_annotations_path = temporary_path / "deployment_annotations.yaml"
+    deployment_annotations_path.write_text(deployment_annotations)
+
+    context = make_context(deployment_annotations_path=deployment_annotations_path)
+
+    # WHEN
+    ensure_deployment_annotations_is_valid_yaml(context)
+
+
+def test_ensure_deployment_annotations_is_valid_yaml_if_not_set() -> None:
+    """
+    GIVEN a valid Deployment annotations is not set
+    WHEN ensuring that it's a valid YAML
+    THEN no exception is raised
+    """
+    # GIVEN
+    context = make_context(deployment_annotations_path=None)
 
     # WHEN
     ensure_deployment_annotations_is_valid_yaml(context)
 
 
 @pytest.mark.parametrize(
-    "deployment_annotations_str, exception",
+    "deployment_annotations, exception",
     [
         pytest.param("aaa", DeploymentAnnotationsNotAMappingError, id="Single string"),
         pytest.param("{", DeploymentAnnotationsInvaliYamlError, id="Broken YAML"),
@@ -412,7 +446,9 @@ def test_ensure_deployment_annotations_is_valid_yaml(
     ],
 )
 def test_ensure_deployment_annotations_is_valid_yaml_fails(
-    deployment_annotations_str: str, exception: type[DeploymentAnnotationsException]
+    temporary_path: Path,
+    deployment_annotations: str,
+    exception: type[DeploymentAnnotationsException],
 ) -> None:
     """
     GIVEN an invalid Deployment annotations string
@@ -420,7 +456,10 @@ def test_ensure_deployment_annotations_is_valid_yaml_fails(
     THEN raise an exception
     """
     # GIVEN
-    context = make_context(deployment_annotations_str=deployment_annotations_str)
+    deployment_annotations_path = temporary_path / "deployment_annotations.yaml"
+    deployment_annotations_path.write_text(deployment_annotations)
+
+    context = make_context(deployment_annotations_path=deployment_annotations_path)
 
     # WHEN
     with pytest.raises(exception):
