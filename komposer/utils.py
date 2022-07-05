@@ -22,7 +22,7 @@ def to_kubernetes_name(string: str) -> str:
 
 def parse_docker_compose_file(compose_path: Path) -> docker_compose.DockerCompose:
     with compose_path.open() as f:
-        content = yaml.load(f, Loader=yaml.Loader)
+        content = yaml.safe_load(f)
 
     config = docker_compose.DockerCompose.parse_obj(content)
 
