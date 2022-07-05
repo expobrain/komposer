@@ -41,7 +41,6 @@ def output_raw_manifest(manifest: dict) -> None:
 )
 @click.option(
     "--extra-manifest",
-    "-e",
     type=click.Path(file_okay=True, dir_okay=False, resolve_path=True, path_type=Path),
     help=(
         "Path to an extra manifest file with custom items to be merged. "

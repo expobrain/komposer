@@ -28,7 +28,6 @@ def make_context(
 ) -> Context:
     temporary_path = temporary_path or Path()
     docker_compose_path = docker_compose_path or (temporary_path / DEFAULT_DOCKER_COMPOSE_FILENAME)
-    extra_manifest_path = extra_manifest_path or Path()
 
     return Context(
         docker_compose_path=docker_compose_path,
