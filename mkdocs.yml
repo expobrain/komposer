@@ -1,0 +1,11 @@
+site_name: Komposer
+theme:
+  name: material
+  features:
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+    - toc.follow
+strict: true
+repo_name: expobrain/komposer
+repo_url: https://github.com/expobrain/komposer

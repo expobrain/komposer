@@ -6,6 +6,8 @@ Komposer is a CLI tool to convert a Docker Compose file into a Kubernetes manife
 
 # Documentation
 
+See the official [documentation](https://expobrain.github.io/komposer/) for details information about the CLI usage.
+
 ## To-do
 
 - set ingress annotations from CLI as file
