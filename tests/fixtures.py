@@ -1,10 +1,9 @@
 from pathlib import Path
 from typing import Optional
 
-from komposer.cli import DEFAULT_DOCKER_COMPOSE_FILENAME
+from komposer.cli import DEFAULT_DOCKER_COMPOSE_FILENAME, DEFAULT_DOCKER_IMAGE
 from komposer.types.cli import Context, DeploymentContext, IngressContext
 
-TEST_IMAGE_NAME = "test-image"
 TEST_PROJECT_NAME = "test-project"
 TEST_BRANCH_NAME = "test-branch"
 TEST_REPOSITORY_NAME = "test-repository"
@@ -20,7 +19,7 @@ def make_context(
     project_name: str = TEST_PROJECT_NAME,
     branch_name: str = TEST_BRANCH_NAME,
     repository_name: str = TEST_REPOSITORY_NAME,
-    default_image: str = TEST_IMAGE_NAME,
+    default_image: str = DEFAULT_DOCKER_IMAGE,
     ingress_for_service: Optional[str] = None,
     extra_manifest_path: Optional[Path] = None,
     ingress_tls_str: Optional[str] = None,

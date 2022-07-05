@@ -4,11 +4,12 @@ from typing import Optional
 
 import pytest
 
+from komposer.cli import DEFAULT_DOCKER_IMAGE
 from komposer.core.deployment import generate_deployment
 from komposer.types import docker_compose, kubernetes
 from komposer.types.cli import Context
 from komposer.types.kubernetes import Annotations, Metadata, UnnamedMetadata
-from tests.fixtures import TEST_IMAGE_NAME, make_context, make_labels
+from tests.fixtures import make_context, make_labels
 
 
 @pytest.mark.parametrize(
@@ -162,7 +163,7 @@ def test_generate_deployment_environment(
                             ],
                             containers=[
                                 kubernetes.Container(
-                                    image=TEST_IMAGE_NAME,
+                                    image=DEFAULT_DOCKER_IMAGE,
                                     name="my-service",
                                     args=["python", "run.py"],
                                     env=[
@@ -210,7 +211,7 @@ def test_generate_deployment_environment(
                             ],
                             containers=[
                                 kubernetes.Container(
-                                    image=TEST_IMAGE_NAME,
+                                    image=DEFAULT_DOCKER_IMAGE,
                                     name="my-service",
                                     args=["python", "run.py"],
                                     env=[
