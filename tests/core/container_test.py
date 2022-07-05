@@ -1,9 +1,9 @@
 import pytest
 
+from komposer.cli import DEFAULT_DOCKER_IMAGE
 from komposer.core.container import generate_container_environment, generate_containers
 from komposer.types import docker_compose, kubernetes
 from komposer.types.cli import Context
-from tests.fixtures import TEST_IMAGE_NAME
 
 
 @pytest.mark.parametrize(
@@ -49,7 +49,7 @@ def test_generate_container_environment_no_env_variables(
                 kubernetes.Container(
                     name="my-service",
                     restartPolicy=None,
-                    image=TEST_IMAGE_NAME,
+                    image=DEFAULT_DOCKER_IMAGE,
                     args=["python", "run.py"],
                 )
             ],
@@ -61,7 +61,7 @@ def test_generate_container_environment_no_env_variables(
                 kubernetes.Container(
                     name="my-service",
                     restartPolicy=None,
-                    image=TEST_IMAGE_NAME,
+                    image=DEFAULT_DOCKER_IMAGE,
                     args=["python", "run.py"],
                     ports=[kubernetes.ContainerPort(containerPort=5432, hostPort=5434)],
                 )
@@ -78,7 +78,7 @@ def test_generate_container_environment_no_env_variables(
                 kubernetes.Container(
                     name="my-service",
                     restartPolicy=kubernetes.RestartPolicy.ON_FAILURE,
-                    image=TEST_IMAGE_NAME,
+                    image=DEFAULT_DOCKER_IMAGE,
                     args=["python", "run.py"],
                     ports=[],
                 )
