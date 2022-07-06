@@ -47,18 +47,11 @@ def generate_containter_ports(ports: list[str]) -> list[kubernetes.ContainerPort
 def generate_container(
     context: Context, service_name: str, service: docker_compose.Service
 ) -> kubernetes.Container:
-    restart_policy = (
-        None
-        if service.restart is None
-        else kubernetes.RestartPolicy.from_docker_compose_restart(service.restart.value)
-    )
-
     return kubernetes.Container(
         image=service.image or context.default_image,
         name=to_kubernetes_name(service_name),
         args=command_to_args(service.command),
         env=list(generate_container_environment(context, service)),
-        restartPolicy=restart_policy,
         ports=generate_containter_ports(service.ports),
     )
 

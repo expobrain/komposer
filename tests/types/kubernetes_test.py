@@ -6,7 +6,6 @@ from komposer.types.kubernetes import (
     EnvironmentVariable,
     Labels,
     Metadata,
-    RestartPolicy,
     ServicePort,
     ServiceRefPort,
 )
@@ -154,28 +153,6 @@ def test_metadata_labels_from_context(context: Context, expected: Labels) -> Non
     """
     # WHEN
     actual = Metadata.labels_from_context(context)
-
-    # THEN
-    assert actual == expected
-
-
-@pytest.mark.parametrize(
-    "restart, expected",
-    [
-        pytest.param("no", RestartPolicy.NEVER),
-        pytest.param("always", RestartPolicy.ON_FAILURE),
-        pytest.param("on-failure", RestartPolicy.ON_FAILURE),
-        pytest.param("unless-stopped", RestartPolicy.NEVER),
-    ],
-)
-def test_restart_policy_from_docker_compose_restart(restart: str, expected: RestartPolicy) -> None:
-    """
-    GIVEN a Docker Compose restart policy
-    WHEN parsing to a Kubernetes restart policy
-    THEN is the expected
-    """
-    # WHEN
-    actual = RestartPolicy.from_docker_compose_restart(restart)
 
     # THEN
     assert actual == expected
