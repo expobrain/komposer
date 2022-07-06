@@ -47,10 +47,7 @@ def test_generate_container_environment_no_env_variables(
             {"my-service": docker_compose.Service(command="python run.py")},
             [
                 kubernetes.Container(
-                    name="my-service",
-                    restartPolicy=None,
-                    image=DEFAULT_DOCKER_IMAGE,
-                    args=["python", "run.py"],
+                    name="my-service", image=DEFAULT_DOCKER_IMAGE, args=["python", "run.py"]
                 )
             ],
             id="Service with no image",
@@ -60,30 +57,12 @@ def test_generate_container_environment_no_env_variables(
             [
                 kubernetes.Container(
                     name="my-service",
-                    restartPolicy=None,
                     image=DEFAULT_DOCKER_IMAGE,
                     args=["python", "run.py"],
                     ports=[kubernetes.ContainerPort(containerPort=5432, hostPort=5434)],
                 )
             ],
             id="Service with port mapping",
-        ),
-        pytest.param(
-            {
-                "my-service": docker_compose.Service(
-                    command="python run.py", restart=docker_compose.RestartPolicy.ALWAYS
-                )
-            },
-            [
-                kubernetes.Container(
-                    name="my-service",
-                    restartPolicy=kubernetes.RestartPolicy.ON_FAILURE,
-                    image=DEFAULT_DOCKER_IMAGE,
-                    args=["python", "run.py"],
-                    ports=[],
-                )
-            ],
-            id="Service with restart policy",
         ),
     ],
 )

@@ -15,7 +15,6 @@ from komposer.types.ports import Ports
 from komposer.utils import to_kubernetes_name
 
 Labels = dict[str, Optional[str]]
-
 Annotations = dict[str, Optional[str]]
 
 
@@ -31,26 +30,6 @@ class PathType(Enum):
     IMPLEMENTATION_SPECIFIC = "ImplementationSpecific"
     EXACT = "Exact"
     PREFIX = "Prefix"
-
-
-@unique
-class RestartPolicy(Enum):
-    NEVER = "Never"
-    ON_FAILURE = "OnFailure"
-
-    @staticmethod
-    def from_docker_compose_restart(restart: str) -> RestartPolicy:
-        restart_policy_map = {
-            "no": RestartPolicy.NEVER,
-            "always": RestartPolicy.ON_FAILURE,
-            "on-failure": RestartPolicy.ON_FAILURE,
-            "unless-stopped": RestartPolicy.NEVER,
-        }
-
-        try:
-            return restart_policy_map[restart]
-        except KeyError:
-            raise NotImplementedError(f"Unknown restart policy: {restart}")
 
 
 class UnnamedMetadata(CamelCaseImmutableBaseModel):
@@ -169,7 +148,6 @@ class Container(CamelCaseImmutableBaseModel):
     image_pull_policy: ImagePullPolicy = ImagePullPolicy.IF_NOT_PRESENT
     image: str
     name: str
-    restart_policy: Optional[RestartPolicy] = None
     args: Optional[list[str]] = None
     env: list[Union[EnvironmentVariable, ConfigMapEnvironmentVariable]] = []
     ports: Optional[list[ContainerPort]] = []
@@ -178,7 +156,6 @@ class Container(CamelCaseImmutableBaseModel):
 class TemplateSpec(CamelCaseImmutableBaseModel):
     service_account_name: Optional[str] = None
     host_aliases: list[HostAlias] = []
-    restart_policy: Optional[RestartPolicy] = None
     containers: list[Container] = []
 
 
