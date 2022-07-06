@@ -9,6 +9,13 @@ from komposer.types.cli import Context
 from komposer.utils import load_yaml
 
 
+def _komposer_service_prefix_value(context: Context) -> str:
+    return context.manifest_prefix
+
+
+komposer_env_variables_map = {"${KOMPOSER_SERVICE_PREFIX}": _komposer_service_prefix_value}
+
+
 class ExtraManifest(CamelCaseImmutableBaseModel):
     api_version: Literal["v1"] = "v1"
     kind: Literal["List"] = "List"
@@ -32,13 +39,27 @@ def update_item_env_configmapkeyref_name(item: dict, manifest_prefix: str) -> No
         config_map_key_ref["name"] = f"{manifest_prefix}-{config_map_key_ref['name']}"
 
 
+def replace_env_variables(context: Context, extra_manifest_str: str) -> str:
+    for env_name, env_fn in komposer_env_variables_map.items():
+        env_value = env_fn(context)
+        extra_manifest_str = extra_manifest_str.replace(env_name, env_value)
+
+    return extra_manifest_str
+
+
 def load_extra_manifest(context: Context) -> list[dict]:
     # Skip if no extra manifest
     if context.extra_manifest_path is None:
         return []
 
+    # Load manifest
+    extra_manifest_str = context.extra_manifest_path.read_text()
+
+    # Replace KOMPOSER_* env variables
+    extra_manifest_str = replace_env_variables(context, extra_manifest_str)
+
     # Parse manifest
-    extra_manifest_raw = load_yaml(context.extra_manifest_path)
+    extra_manifest_raw = load_yaml(extra_manifest_str)
 
     # just validate that the format of the file
     parse_obj_as(ExtraManifest, extra_manifest_raw)

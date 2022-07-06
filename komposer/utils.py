@@ -20,8 +20,13 @@ def to_kubernetes_name(string: str) -> str:
     return name
 
 
-def load_yaml(path: Path) -> Any:
-    return yaml.safe_load(path.open())
+def load_yaml(source: Union[Path, str]) -> Any:
+    if isinstance(source, Path):
+        source = source.read_text()
+
+    content = yaml.safe_load(source)
+
+    return content
 
 
 def parse_docker_compose_file(compose_path: Path) -> docker_compose.DockerCompose:

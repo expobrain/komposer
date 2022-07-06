@@ -62,6 +62,61 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
                 "items": [
                     {
                         "apiVersion": "v1",
+                        "kind": "Job",
+                        "metadata": {"name": "job-1"},
+                        "spec": {
+                            "template": {
+                                "spec": {
+                                    "containers": [
+                                        {
+                                            "args": [
+                                                "ping",
+                                                "${KOMPOSER_SERVICE_PREFIX}-service=1}",
+                                            ],
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                    }
+                ],
+            },
+            [
+                {
+                    "apiVersion": "v1",
+                    "kind": "Job",
+                    "metadata": {
+                        "name": "test-project-test-repository-test-branch-job-1",
+                        "labels": {
+                            "repository": "test-repository",
+                            "branch": "test-branch",
+                        },
+                    },
+                    "spec": {
+                        "template": {
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "args": [
+                                            "ping",
+                                            "test-project-test-repository-test-branch-service=1}",
+                                        ],
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                }
+            ],
+            id="Single item with ${KOMPOSER_SERVICE_PREFIX} env var",
+        ),
+        pytest.param(
+            {
+                "apiVersion": "v1",
+                "kind": "List",
+                "items": [
+                    {
+                        "apiVersion": "v1",
                         "kind": "Service",
                         "metadata": {
                             "name": "service-1",
