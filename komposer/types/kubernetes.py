@@ -43,8 +43,8 @@ class Metadata(UnnamedMetadata):
     @staticmethod
     def labels_from_context(context: Context) -> Labels:
         return {
-            "repository": context.repository_name_kubernetes,
-            "branch": context.branch_name_kubernetes,
+            "repository": context.repository_name,
+            "branch": context.branch_name,
         }
 
     @staticmethod

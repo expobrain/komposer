@@ -1,8 +1,23 @@
+import re
 from pathlib import Path
 from typing import Any, Optional
 
+from pydantic import validator
+
 from komposer.types.base import ImmutableBaseModel
-from komposer.utils import load_yaml, to_kubernetes_name
+from komposer.utils import load_yaml
+
+RFC_1123_MAX_LENGTH = 63
+
+rfc_1123_re = re.compile(r"^[a-z][a-z\-0-9]*[a-z]$")
+
+
+def ensure_is_rfc_1123(string: str) -> None:
+    if not rfc_1123_re.match(string):
+        raise ValueError("Not a valid RFC-1123 string")
+
+    if len(string) > RFC_1123_MAX_LENGTH:
+        raise ValueError("String is longer than 63 characters")
 
 
 class DeploymentContext(ImmutableBaseModel):
@@ -33,24 +48,24 @@ class Context(ImmutableBaseModel):
     deployment: DeploymentContext
     ingress: IngressContext
 
-    @property
-    def project_name_kubernetes(self) -> str:
-        return to_kubernetes_name(self.project_name)
+    @validator("project_name")
+    def project_name_matches_kubernetes_name(cls, value: str) -> str:
+        ensure_is_rfc_1123(value)
 
-    @property
-    def branch_name_kubernetes(self) -> str:
-        return to_kubernetes_name(self.branch_name)
+        return value
 
-    @property
-    def repository_name_kubernetes(self) -> str:
-        return to_kubernetes_name(self.repository_name)
+    @validator("branch_name")
+    def branch_name_matches_kubernetes_name(cls, value: str) -> str:
+        ensure_is_rfc_1123(value)
+
+        return value
+
+    @validator("repository_name")
+    def repository_name_matches_kubernetes_name(cls, value: str) -> str:
+        ensure_is_rfc_1123(value)
+
+        return value
 
     @property
     def manifest_prefix(self) -> str:
-        return "-".join(
-            [
-                self.project_name_kubernetes,
-                self.repository_name_kubernetes,
-                self.branch_name_kubernetes,
-            ]
-        )
+        return "-".join([self.project_name, self.repository_name, self.branch_name])

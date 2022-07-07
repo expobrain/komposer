@@ -125,24 +125,6 @@ def test_service_ref_port_from_string(string: str, expected: ServiceRefPort) -> 
             },
             id="Default values",
         ),
-        pytest.param(
-            make_context(
-                branch_name=TEST_BRANCH_NAME.upper(), repository_name=TEST_REPOSITORY_NAME.upper()
-            ),
-            {
-                "repository": to_kubernetes_name(TEST_REPOSITORY_NAME),
-                "branch": to_kubernetes_name(TEST_BRANCH_NAME),
-            },
-            id="Default uppercase values",
-        ),
-        pytest.param(
-            make_context(branch_name="my/branch", repository_name="my/repository"),
-            {
-                "repository": "my-repository",
-                "branch": "my-branch",
-            },
-            id="Values with special characters",
-        ),
     ],
 )
 def test_metadata_labels_from_context(context: Context, expected: Labels) -> None:
