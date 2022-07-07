@@ -18,6 +18,10 @@ class ComposePortsNotUniqueError(KomposerException):
     pass
 
 
+class ComposePortsMappingNotSuportedError(KomposerException):
+    pass
+
+
 class InvalidServiceNameError(KomposerException):
     pass
 

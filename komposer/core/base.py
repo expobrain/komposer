@@ -8,6 +8,7 @@ from komposer.core.extra_manifest import load_extra_manifest
 from komposer.core.ingress import generate_ingress_from_services
 from komposer.core.service import generate_services
 from komposer.exceptions import (
+    ComposePortsMappingNotSuportedError,
     ComposePortsNotUniqueError,
     DeploymentAnnotationsInvaliYamlError,
     DeploymentAnnotationsNotAMappingError,
@@ -85,6 +86,17 @@ def ensure_deployment_annotations_is_valid_yaml(context: Context) -> None:
         )
 
 
+def ensure_service_without_port_mapping(compose: docker_compose.DockerCompose) -> None:
+    for service_name, service in compose.services.items():
+        for ports_str in service.ports:
+            ports = Ports.from_string(ports_str)
+
+            if not ports.same_ports():
+                raise ComposePortsMappingNotSuportedError(
+                    f"Service {service_name} has a port mapping {ports_str} that is not supported"
+                )
+
+
 def generate_manifest_from_docker_compose(context: Context) -> dict:
     # Parse docker compose file
     compose = parse_docker_compose_file(context.docker_compose_path)
@@ -94,6 +106,7 @@ def generate_manifest_from_docker_compose(context: Context) -> dict:
     ensure_ingress_tls_is_valid_yaml(context)
     ensure_unique_ports_on_docker_compose(compose)
     ensure_service_name_lowercase_RFC_1123(compose)
+    ensure_service_without_port_mapping(compose)
 
     # Generate configmaps
     config_maps = generate_config_maps(context, compose)

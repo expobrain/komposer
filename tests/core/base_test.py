@@ -8,10 +8,12 @@ from komposer.core.base import (
     ensure_deployment_annotations_is_valid_yaml,
     ensure_ingress_tls_is_valid_yaml,
     ensure_service_name_lowercase_RFC_1123,
+    ensure_service_without_port_mapping,
     ensure_unique_ports_on_docker_compose,
     generate_manifest_from_docker_compose,
 )
 from komposer.exceptions import (
+    ComposePortsMappingNotSuportedError,
     ComposePortsNotUniqueError,
     DeploymentAnnotationsException,
     DeploymentAnnotationsInvaliYamlError,
@@ -27,8 +29,10 @@ from komposer.utils import as_json_object
 from tests.fixtures import make_context, make_labels
 
 
-def make_minimal_docker_compose() -> docker_compose.DockerCompose:
-    return docker_compose.DockerCompose(services={"my-service": docker_compose.Service()})
+def make_minimal_docker_compose(ports: list[str] = None) -> docker_compose.DockerCompose:
+    return docker_compose.DockerCompose(
+        services={"my-service": docker_compose.Service(ports=ports or [])}
+    )
 
 
 def make_minimal_service() -> kubernetes.Service:
@@ -260,6 +264,40 @@ def test_ensure_service_name_lowercase_RFC_1123_fails(
             id="Single service",
         ),
         pytest.param(
+            make_context(),
+            make_minimal_docker_compose(ports=["8080"]),
+            [],
+            make_minimal_deployment(),
+            [make_minimal_service()],
+            [],
+            {
+                "apiVersion": "v1",
+                "kind": "List",
+                "items": [
+                    as_json_object(make_minimal_deployment()),
+                    as_json_object(make_minimal_service()),
+                ],
+            },
+            id="Single service with single port",
+        ),
+        pytest.param(
+            make_context(),
+            make_minimal_docker_compose(ports=["8080:8080"]),
+            [],
+            make_minimal_deployment(),
+            [make_minimal_service()],
+            [],
+            {
+                "apiVersion": "v1",
+                "kind": "List",
+                "items": [
+                    as_json_object(make_minimal_deployment()),
+                    as_json_object(make_minimal_service()),
+                ],
+            },
+            id="Single service with same mapped port",
+        ),
+        pytest.param(
             make_context(ingress_for_service="my-service"),
             make_minimal_docker_compose(),
             [],
@@ -464,3 +502,48 @@ def test_ensure_deployment_annotations_is_valid_yaml_fails(
     # WHEN
     with pytest.raises(exception):
         ensure_deployment_annotations_is_valid_yaml(context)
+
+
+@pytest.mark.parametrize(
+    "ports",
+    [
+        pytest.param([], id="No ports"),
+        pytest.param(["8080"], id="Single port"),
+        pytest.param(["8080:8080"], id="Mapped port with same value"),
+    ],
+)
+def test_ensure_service_without_port_mapping(ports: list[str]) -> None:
+    """
+    GIVEN a service without port mapping
+    WHEN ensuring that all the services doen't have port mapping
+    THEN no exception is raised
+    """
+    # GIVEN
+    compose = docker_compose.DockerCompose(
+        services={"my-service": docker_compose.Service(ports=ports)}
+    )
+
+    # THEN
+    ensure_service_without_port_mapping(compose)
+
+
+@pytest.mark.parametrize(
+    "ports",
+    [
+        pytest.param(["9000:8080"], id="Mapped port with different value"),
+    ],
+)
+def test_ensure_service_without_port_mapping_fails_if_port_mapping(ports: list[str]) -> None:
+    """
+    GIVEN a service with port mapping
+    WHEN ensuring that all the services doen't have port mapping
+    THEN raises an exception
+    """
+    # GIVEN
+    compose = docker_compose.DockerCompose(
+        services={"my-service": docker_compose.Service(ports=ports)}
+    )
+
+    # THEN
+    with pytest.raises(ComposePortsMappingNotSuportedError):
+        ensure_service_without_port_mapping(compose)
