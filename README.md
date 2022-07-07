@@ -1,8 +1,14 @@
 # komposer
 
+![main build status](https://github.com/expobrain/komposer/actions/workflows/main.yml/badge.svg?branch=main)
+
+Komposer is a CLI tool to convert a Docker Compose file into a Kubernetes manifest file so that you can deploy your Docker Compose stack it into a single Kubernetes Pod.
+
+# Documentation
+
 ## To-do
 
 - set ingress annotations from CLI as file
-- set ingress paths from CLI
-- needs the ingress class name, mandatory if ingress is selected
-- set custom resource limits
+- set ingress paths from CLI as a file
+- able to select the Ingress class name
+- able to set custom resource limits
