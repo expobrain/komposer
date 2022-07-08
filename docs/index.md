@@ -1,18 +1,22 @@
-# Welcome to MkDocs
+![main build status](https://github.com/expobrain/komposer/actions/workflows/main.yml/badge.svg?branch=main)
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+Welcome to Komposer documentation.
 
-## Commands
+Komposer is a CLI tool to convert a Docker Compose file into a Kubernetes manifest file so that you can deploy your Docker Compose stack it into a single Kubernetes Pod.
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+This project has been heavly inspired by [Kompose](https://kompose.io/).
 
-## Project layout
+## Why not using Kompose
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
-## aaa
+Why not using Kompose instead o creating a new project?
+
+The short answer is that Kompose does a slightly different job that what Komposer does:
+
+- Kompose is a tool to replicate as is the Docker Compose setup into a Kubernetes cluster
+- Komposer is a tool to deploy Docker Compose setup on Kubernetes for development purposes.
+
+Other than that there are other small differences:
+
+- Kompose doesn't create ConfigMaps for services in Docker Compose that load environment variables from a file using the `env_file` option
+- Kompose doesn't have an option to create an Ingress for a specific service
+- Kompose doesn't give the ability to specify extra Kubernetes items outside the Docker Compose file

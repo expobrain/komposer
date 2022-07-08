@@ -9,3 +9,28 @@ theme:
 strict: true
 repo_name: expobrain/komposer
 repo_url: https://github.com/expobrain/komposer
+nav:
+  - Overview: index.md
+  - Architecture: getting_started/architecture.md
+  - Getting started:
+      - Install: getting_started/install.md
+      - Basic configuration: getting_started/basic_configuration.md
+  - Usage:
+      - CLI Arguments: usage/cli_arguments.md
+      - Environment viariables: usage/env_variables.md
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      # make exceptions to highlighting of code:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid
+plugins:
+  - search
+  - mermaid2
