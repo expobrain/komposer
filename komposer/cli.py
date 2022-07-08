@@ -2,10 +2,10 @@ from pathlib import Path
 from typing import Optional
 
 import click
-import yaml
 
 from komposer.core.base import generate_manifest_from_docker_compose
 from komposer.types.cli import Context, DeploymentContext, IngressContext
+from komposer.utils import dump_yaml
 
 DEFAULT_DOCKER_COMPOSE_FILENAME = Path("docker-compose.yml")
 DEFAULT_PROJECT_NAME = "default"
@@ -13,7 +13,7 @@ DEFAULT_DOCKER_IMAGE = "${IMAGE}"
 
 
 def output_raw_manifest(manifest: dict) -> None:
-    output = yaml.safe_dump(manifest)
+    output = dump_yaml(manifest)
 
     print(output)
 

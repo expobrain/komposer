@@ -11,6 +11,15 @@ from pydantic import BaseModel
 from komposer.types import docker_compose
 
 
+def str_presenter(dumper: yaml.representer.SafeRepresenter, data: Any) -> yaml.nodes.Node:
+    if len(data.splitlines()) > 1:  # check for multiline string
+        return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
+    return dumper.represent_scalar("tag:yaml.org,2002:str", data)
+
+
+yaml.representer.SafeRepresenter.add_representer(str, str_presenter)
+
+
 def to_kubernetes_name(string: str) -> str:
     name: str = stringcase.spinalcase(string.strip().lower().replace("/", "-").replace(":", "-"))
 
@@ -27,6 +36,12 @@ def load_yaml(source: Union[Path, str]) -> Any:
     content = yaml.safe_load(source)
 
     return content
+
+
+def dump_yaml(data: Any) -> str:
+    output: str = yaml.safe_dump(data)
+
+    return output
 
 
 def parse_docker_compose_file(compose_path: Path) -> docker_compose.DockerCompose:
