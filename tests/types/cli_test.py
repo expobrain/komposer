@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from komposer.types.cli import ensure_is_rfc_1123
+from komposer.types.cli import ensure_lowercase_kebab
 from tests.fixtures import make_context
 
 
@@ -45,37 +45,34 @@ def test_context_manifest_prefix(
         pytest.param("string", id="Simple string"),
         pytest.param("my-string", id="String with hyphens"),
         pytest.param("my-1-string", id="String with digits"),
-        pytest.param("a" * 63, id="Max length of the string"),
+        pytest.param("1-string", id="String with leading digits"),
+        pytest.param("string-1", id="String with trailing digits"),
     ],
 )
 def test_ensure_is_kubernetes_name(value: str) -> None:
     """
     GIVEN a string
-        AND the string is a valid RFC 1123
+        AND the string is in lowercase kebab format
     WHEN calling ensure_is_kubernetes_name
     THEN no exception is raised
     """
-    ensure_is_rfc_1123(value)
+    ensure_lowercase_kebab(value)
 
 
 @pytest.mark.parametrize(
-    "value, expected",
+    "value",
     [
-        pytest.param("", "Not a valid RFC-1123 string", id="Empty string"),
-        pytest.param("1string", "Not a valid RFC-1123 string", id="String with leading digit"),
-        pytest.param("string1", "Not a valid RFC-1123 string", id="String with trailing digit"),
-        pytest.param(
-            "my/string", "Not a valid RFC-1123 string", id="String with unsupported symbol"
-        ),
-        pytest.param("a" * 64, "String is longer than 63 characters", id="String is too long"),
+        pytest.param("", id="Empty string"),
+        pytest.param("my/string", id="String with unsupported symbol /"),
+        pytest.param("my_string", id="String with unsupported symbol _"),
     ],
 )
-def test_ensure_is_kubernetes_name_fails_if_not_rfc_1123(value: str, expected: str) -> None:
+def test_ensure_is_kubernetes_name_fails_if_not_lowercase_kebak(value: str) -> None:
     """
     GIVEN a string
-        AND the string is not a valid RFC 1123
+        AND the string is not in lowercase kebab format
     WHEN calling ensure_is_kubernetes_name
     THEN an exception is raised
     """
-    with pytest.raises(ValueError, match=expected):
-        ensure_is_rfc_1123(value)
+    with pytest.raises(ValueError, match="Not a lowercase kebab string"):
+        ensure_lowercase_kebab(value)

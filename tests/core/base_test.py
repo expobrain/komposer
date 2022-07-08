@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Sequence
+from typing import Optional, Sequence
 
 import pytest
 from pytest_mock import MockerFixture
@@ -29,7 +29,7 @@ from komposer.utils import as_json_object
 from tests.fixtures import make_context, make_labels
 
 
-def make_minimal_docker_compose(ports: list[str] = None) -> docker_compose.DockerCompose:
+def make_minimal_docker_compose(ports: Optional[list[str]] = None) -> docker_compose.DockerCompose:
     return docker_compose.DockerCompose(
         services={"my-service": docker_compose.Service(ports=ports or [])}
     )
