@@ -605,6 +605,7 @@ python-versions = ">=3.6.3,<4.0.0"
 [package.dependencies]
 commonmark = ">=0.9.0,<0.10.0"
 pygments = ">=2.6.0,<3.0.0"
+typing-extensions = {version = ">=4.0.0,<5.0", markers = "python_version < \"3.9\""}
 
 [package.extras]
 jupyter = ["ipywidgets (>=7.5.1,<8.0.0)"]
@@ -690,8 +691,8 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.9"
-content-hash = "a7c4ada060f57a3d602205e52c1bd0f83ef45281f13bb9bd1b82071714a15546"
+python-versions = "^3.8"
+content-hash = "1bd5abee27f7e39fd87db9467c1201aeb1bc2e268fabdd6b0c198e02e1cf3e76"
 
 [metadata.files]
 atomicwrites = [
