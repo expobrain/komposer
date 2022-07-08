@@ -1,11 +1,12 @@
 import textwrap
 from pathlib import Path
+from typing import Any
 
 import pytest
 
 from komposer.core.base import parse_docker_compose_file
 from komposer.types.docker_compose import DockerCompose, Service
-from komposer.utils import to_kubernetes_name
+from komposer.utils import dump_yaml, to_kubernetes_name
 
 
 @pytest.mark.parametrize(
@@ -137,6 +138,34 @@ def test_to_kubernetes_name(string: str, expected: str) -> None:
     """
     # WHEN
     actual = to_kubernetes_name(string)
+
+    # THEN
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "data, expected",
+    [
+        pytest.param(
+            {"key": "first line\nsecond line"},
+            textwrap.dedent(
+                """
+                key: |-
+                  first line
+                  second line
+                """
+            ).lstrip(),
+        )
+    ],
+)
+def test_dump_yaml(data: Any, expected: str) -> None:
+    """
+    GIVEN a data structure
+    WHEN dumping to YAML
+    THEN is the expected
+    """
+    # WHEN
+    actual = dump_yaml(data)
 
     # THEN
     assert actual == expected
