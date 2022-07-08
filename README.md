@@ -14,3 +14,5 @@ See the official [documentation](https://expobrain.github.io/komposer/) for deta
 - set ingress paths from CLI as a file
 - able to select the Ingress class name
 - able to set custom resource limits
+- add annotations to all Kubernetes items with Komposer version
+- use labels in Docker Compose file as alternative for CLI options
