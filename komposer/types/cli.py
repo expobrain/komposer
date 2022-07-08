@@ -7,17 +7,12 @@ from pydantic import validator
 from komposer.types.base import ImmutableBaseModel
 from komposer.utils import load_yaml
 
-RFC_1123_MAX_LENGTH = 63
-
-rfc_1123_re = re.compile(r"^[a-z][a-z\-0-9]*[a-z]$")
+lowercase_kebak_re = re.compile(r"^[a-z0-9][a-z\-0-9]*[a-z0-9]$")
 
 
-def ensure_is_rfc_1123(string: str) -> None:
-    if not rfc_1123_re.match(string):
-        raise ValueError("Not a valid RFC-1123 string")
-
-    if len(string) > RFC_1123_MAX_LENGTH:
-        raise ValueError("String is longer than 63 characters")
+def ensure_lowercase_kebab(string: str) -> None:
+    if not lowercase_kebak_re.match(string):
+        raise ValueError("Not a lowercase kebab string")
 
 
 class DeploymentContext(ImmutableBaseModel):
@@ -50,19 +45,19 @@ class Context(ImmutableBaseModel):
 
     @validator("project_name")
     def project_name_matches_kubernetes_name(cls, value: str) -> str:
-        ensure_is_rfc_1123(value)
+        ensure_lowercase_kebab(value)
 
         return value
 
     @validator("branch_name")
     def branch_name_matches_kubernetes_name(cls, value: str) -> str:
-        ensure_is_rfc_1123(value)
+        ensure_lowercase_kebab(value)
 
         return value
 
     @validator("repository_name")
     def repository_name_matches_kubernetes_name(cls, value: str) -> str:
-        ensure_is_rfc_1123(value)
+        ensure_lowercase_kebab(value)
 
         return value
 
