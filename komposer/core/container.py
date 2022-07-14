@@ -1,6 +1,7 @@
 import itertools
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable, Union
+from typing import Union
 
 from komposer.types import docker_compose, kubernetes
 from komposer.types.cli import Context

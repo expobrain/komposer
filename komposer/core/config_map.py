@@ -1,6 +1,7 @@
+from collections.abc import Iterable
 from io import StringIO
 from pathlib import Path
-from typing import Iterable, Optional
+from typing import Optional
 
 from dotenv import dotenv_values
 

@@ -1,5 +1,6 @@
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Optional, Sequence
+from typing import Optional
 
 import pytest
 from pytest_mock import MockerFixture
