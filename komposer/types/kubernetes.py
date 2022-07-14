@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from enum import Enum, unique
 from io import StringIO
 from ipaddress import IPv4Address
 from pathlib import Path
-from typing import Iterable, Literal, Optional, Union
+from typing import Literal, Optional, Union
 
 from dotenv import dotenv_values
 from pydantic import Field

@@ -1,6 +1,6 @@
+from collections.abc import Iterable
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Iterable
 
 import pytest
 
