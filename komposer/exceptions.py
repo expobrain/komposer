@@ -40,3 +40,19 @@ class DeploymentAnnotationsInvaliYamlError(DeploymentAnnotationsException):
 
 class DeploymentAnnotationsNotAMappingError(DeploymentAnnotationsException):
     pass
+
+
+class ExtraManifestException(KomposerException):
+    pass
+
+
+class ExtraManifestInvalidYamlError(ExtraManifestException):
+    pass
+
+
+class ExtraManifestMissingMetadataError(ExtraManifestException):
+    pass
+
+
+class ExtraManifestMissingNameError(ExtraManifestException):
+    pass
