@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from pathlib import Path
 
 import pytest
@@ -27,7 +28,7 @@ from tests.fixtures import make_labels
             [
                 ConfigMap(
                     metadata=Metadata(
-                        name="test-project-test-repository-test-branch-env", labels=make_labels()
+                        name="test-repository-test-branch-env", labels=make_labels()
                     ),
                     data={"MY_VARIABLE": "my-value"},
                 )
@@ -39,7 +40,7 @@ from tests.fixtures import make_labels
             [
                 ConfigMap(
                     metadata=Metadata(
-                        name="test-project-test-repository-test-branch-env", labels=make_labels()
+                        name="test-repository-test-branch-env", labels=make_labels()
                     ),
                     data={"MY_VARIABLE": None},
                 )
@@ -51,7 +52,7 @@ from tests.fixtures import make_labels
             [
                 ConfigMap(
                     metadata=Metadata(
-                        name="test-project-test-repository-test-branch-env", labels=make_labels()
+                        name="test-repository-test-branch-env", labels=make_labels()
                     ),
                     data={"MY_VARIABLE": ""},
                 )
@@ -96,7 +97,7 @@ def test_generate_config_map_from_file(
             [
                 ConfigMap(
                     metadata=Metadata(
-                        name="test-project-test-repository-test-branch-my-service",
+                        name="test-repository-test-branch-my-service",
                         labels=make_labels(),
                         annotations=None,
                     ),
@@ -116,7 +117,7 @@ def test_generate_config_map_from_file(
             [
                 ConfigMap(
                     metadata=Metadata(
-                        name="test-project-test-repository-test-branch-my-service",
+                        name="test-repository-test-branch-my-service",
                         labels=make_labels(),
                         annotations=None,
                     ),
@@ -132,7 +133,7 @@ def test_generate_config_map_from_file(
             [
                 ConfigMap(
                     metadata=Metadata(
-                        name="test-project-test-repository-test-branch-my-service",
+                        name="test-repository-test-branch-my-service",
                         labels=make_labels(),
                         annotations=None,
                     ),
@@ -148,7 +149,7 @@ def test_generate_config_map_from_file(
             [
                 ConfigMap(
                     metadata=Metadata(
-                        name="test-project-test-repository-test-branch-my-service",
+                        name="test-repository-test-branch-my-service",
                         labels=make_labels(),
                         annotations=None,
                     ),
@@ -164,7 +165,7 @@ def test_generate_config_map_from_file(
             [
                 ConfigMap(
                     metadata=Metadata(
-                        name="test-project-test-repository-test-branch-my-service",
+                        name="test-repository-test-branch-my-service",
                         labels=make_labels(),
                         annotations=None,
                     ),
@@ -181,7 +182,7 @@ def test_generate_config_map_from_file(
     ],
 )
 def test_generate_config_map_from_list_of_envs(
-    context: Context, compose: docker_compose.DockerCompose, expected: list[ConfigMap]
+    context: Context, compose: docker_compose.DockerCompose, expected: Sequence[ConfigMap]
 ) -> None:
     """
     GIVEN a list of environments variable

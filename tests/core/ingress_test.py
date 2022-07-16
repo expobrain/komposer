@@ -1,3 +1,4 @@
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any, Optional
 
@@ -20,7 +21,7 @@ from tests.fixtures import make_context, make_labels
             None,
             kubernetes.Ingress(
                 metadata=Metadata(
-                    name="test-project-test-repository-test-branch-my-service",
+                    name="test-repository-test-branch-my-service",
                     labels=make_labels(),
                     annotations={"cert-manager.io/cluster-issuer": "letsencrypt-prod"},
                 ),
@@ -29,9 +30,7 @@ from tests.fixtures import make_context, make_labels
                     rules=[
                         IngressRule(
                             host=(
-                                "my-service"
-                                ".test-project-test-repository-test-branch"
-                                ".svc.cluster.local"
+                                "my-service" ".test-repository-test-branch" ".svc.cluster.local"
                             ),
                             http=kubernetes.HttpPaths(paths=[]),
                         )
@@ -50,7 +49,7 @@ from tests.fixtures import make_context, make_labels
             ],
             kubernetes.Ingress(
                 metadata=Metadata(
-                    name="test-project-test-repository-test-branch-my-service",
+                    name="test-repository-test-branch-my-service",
                     labels=make_labels(),
                     annotations={"cert-manager.io/cluster-issuer": "letsencrypt-prod"},
                 ),
@@ -64,9 +63,7 @@ from tests.fixtures import make_context, make_labels
                     rules=[
                         IngressRule(
                             host=(
-                                "my-service"
-                                ".test-project-test-repository-test-branch"
-                                ".svc.cluster.local"
+                                "my-service" ".test-repository-test-branch" ".svc.cluster.local"
                             ),
                             http=kubernetes.HttpPaths(paths=[]),
                         )
@@ -80,7 +77,7 @@ from tests.fixtures import make_context, make_labels
             None,
             kubernetes.Ingress(
                 metadata=Metadata(
-                    name="test-project-test-repository-test-branch-my-service",
+                    name="test-repository-test-branch-my-service",
                     labels=make_labels(),
                     annotations={"cert-manager.io/cluster-issuer": "letsencrypt-prod"},
                 ),
@@ -89,9 +86,7 @@ from tests.fixtures import make_context, make_labels
                     rules=[
                         IngressRule(
                             host=(
-                                "my-service"
-                                ".test-project-test-repository-test-branch"
-                                ".svc.cluster.local"
+                                "my-service" ".test-repository-test-branch" ".svc.cluster.local"
                             ),
                             http=kubernetes.HttpPaths(
                                 paths=[
@@ -100,7 +95,7 @@ from tests.fixtures import make_context, make_labels
                                         pathType=kubernetes.PathType.PREFIX,
                                         backend=kubernetes.Backend(
                                             service=kubernetes.ServiceRef(
-                                                name="test-project-test-repository-test-branch-my-service",  # noqa: E501
+                                                name="test-repository-test-branch-my-service",  # noqa: E501
                                                 port=kubernetes.ServiceRefPort(number=8080),
                                             )
                                         ),
@@ -118,7 +113,7 @@ from tests.fixtures import make_context, make_labels
             None,
             kubernetes.Ingress(
                 metadata=Metadata(
-                    name="test-project-test-repository-test-branch-my-service",
+                    name="test-repository-test-branch-my-service",
                     labels=make_labels(),
                     annotations={"cert-manager.io/cluster-issuer": "letsencrypt-prod"},
                 ),
@@ -127,9 +122,7 @@ from tests.fixtures import make_context, make_labels
                     rules=[
                         IngressRule(
                             host=(
-                                "my-service"
-                                ".test-project-test-repository-test-branch"
-                                ".svc.cluster.local"
+                                "my-service" ".test-repository-test-branch" ".svc.cluster.local"
                             ),
                             http=kubernetes.HttpPaths(
                                 paths=[
@@ -138,7 +131,7 @@ from tests.fixtures import make_context, make_labels
                                         pathType=kubernetes.PathType.PREFIX,
                                         backend=kubernetes.Backend(
                                             service=kubernetes.ServiceRef(
-                                                name="test-project-test-repository-test-branch-my-service",  # noqa: E501
+                                                name="test-repository-test-branch-my-service",  # noqa: E501
                                                 port=kubernetes.ServiceRefPort(number=8080),
                                             )
                                         ),
@@ -156,7 +149,7 @@ from tests.fixtures import make_context, make_labels
 def test_generate_ingress_from_service(
     temporary_path: Path,
     services: docker_compose.Services,
-    ingress_tls: Optional[list[dict[str, Any]]],
+    ingress_tls: Optional[Sequence[Mapping[str, Any]]],
     expected: kubernetes.Ingress,
 ) -> None:
     """

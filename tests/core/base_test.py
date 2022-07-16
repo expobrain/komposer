@@ -317,7 +317,7 @@ def test_ensure_service_name_lowercase_RFC_1123_fails(
             id="Single service with ingress",
         ),
         pytest.param(
-            make_context(extra_manifest_path="my-service"),
+            make_context(extra_manifest_path=Path("extra.yaml")),
             make_minimal_docker_compose(),
             [],
             make_minimal_deployment(),

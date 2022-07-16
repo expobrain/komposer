@@ -16,7 +16,7 @@ def make_labels() -> dict[str, str]:
 def make_context(
     temporary_path: Optional[Path] = None,
     docker_compose_path: Optional[Path] = None,
-    project_name: str = TEST_PROJECT_NAME,
+    project_name: Optional[str] = None,
     branch_name: str = TEST_BRANCH_NAME,
     repository_name: str = TEST_REPOSITORY_NAME,
     default_image: str = DEFAULT_DOCKER_IMAGE,

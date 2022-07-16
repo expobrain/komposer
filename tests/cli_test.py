@@ -7,27 +7,15 @@ from pytest_mock import MockerFixture
 
 from komposer import cli
 from komposer.types.cli import Context
-from tests.fixtures import (
-    TEST_BRANCH_NAME,
-    TEST_PROJECT_NAME,
-    TEST_REPOSITORY_NAME,
-    make_context,
-)
+from tests.fixtures import TEST_BRANCH_NAME, TEST_REPOSITORY_NAME, make_context
 
 
 def make_mandatory_long_args() -> list[str]:
-    return [
-        "--project-name",
-        TEST_PROJECT_NAME,
-        "--repository-name",
-        TEST_REPOSITORY_NAME,
-        "--branch-name",
-        TEST_BRANCH_NAME,
-    ]
+    return ["--repository-name", TEST_REPOSITORY_NAME, "--branch-name", TEST_BRANCH_NAME]
 
 
 def make_mandatory_short_args() -> list[str]:
-    return ["-p", TEST_PROJECT_NAME, "-r", TEST_REPOSITORY_NAME, "-b", TEST_BRANCH_NAME]
+    return ["-r", TEST_REPOSITORY_NAME, "-b", TEST_BRANCH_NAME]
 
 
 @pytest.mark.parametrize(

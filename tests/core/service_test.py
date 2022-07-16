@@ -1,3 +1,5 @@
+from collections.abc import Sequence
+
 import pytest
 
 from komposer.core.service import generate_services
@@ -18,7 +20,7 @@ from tests.fixtures import make_labels
                     apiversion="v1",
                     kind="Service",
                     metadata=Metadata(
-                        name="test-project-test-repository-test-branch-my-service",
+                        name="test-repository-test-branch-my-service",
                         labels=make_labels(),
                         annotations=None,
                     ),
@@ -39,7 +41,7 @@ from tests.fixtures import make_labels
                     apiversion="v1",
                     kind="Service",
                     metadata=Metadata(
-                        name="test-project-test-repository-test-branch-my-service",
+                        name="test-repository-test-branch-my-service",
                         labels=make_labels(),
                         annotations=None,
                     ),
@@ -59,7 +61,7 @@ from tests.fixtures import make_labels
     ],
 )
 def test_generate_services(
-    context: Context, services: docker_compose.Services, expected: list[kubernetes.Service]
+    context: Context, services: docker_compose.Services, expected: Sequence[kubernetes.Service]
 ) -> None:
     """
     GIVEN a Docker Compose services
