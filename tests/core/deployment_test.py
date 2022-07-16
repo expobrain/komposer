@@ -20,9 +20,7 @@ from tests.fixtures import make_context, make_labels
             kubernetes.Deployment(
                 apiversion="v1",
                 kind="Deployment",
-                metadata=Metadata(
-                    name="test-project-test-repository-test-branch", labels=make_labels()
-                ),
+                metadata=Metadata(name="test-repository-test-branch", labels=make_labels()),
                 spec=kubernetes.DeploymentSpec(
                     hostAliases=[],
                     selector=kubernetes.Selector(matchLabels=make_labels()),
@@ -46,9 +44,7 @@ from tests.fixtures import make_context, make_labels
             kubernetes.Deployment(
                 apiversion="v1",
                 kind="Deployment",
-                metadata=Metadata(
-                    name="test-project-test-repository-test-branch", labels=make_labels()
-                ),
+                metadata=Metadata(name="test-repository-test-branch", labels=make_labels()),
                 spec=kubernetes.DeploymentSpec(
                     selector=kubernetes.Selector(matchLabels=make_labels()),
                     template=kubernetes.Template(
@@ -88,9 +84,7 @@ from tests.fixtures import make_context, make_labels
             kubernetes.Deployment(
                 apiversion="v1",
                 kind="Deployment",
-                metadata=Metadata(
-                    name="test-project-test-repository-test-branch", labels=make_labels()
-                ),
+                metadata=Metadata(name="test-repository-test-branch", labels=make_labels()),
                 spec=kubernetes.DeploymentSpec(
                     selector=kubernetes.Selector(matchLabels=make_labels()),
                     template=kubernetes.Template(
@@ -150,9 +144,7 @@ def test_generate_deployment_environment(
             kubernetes.Deployment(
                 apiversion="apps/v1",
                 kind="Deployment",
-                metadata=Metadata(
-                    name="test-project-test-repository-test-branch", labels=make_labels()
-                ),
+                metadata=Metadata(name="test-repository-test-branch", labels=make_labels()),
                 spec=kubernetes.DeploymentSpec(
                     selector=kubernetes.Selector(matchLabels=make_labels()),
                     template=kubernetes.Template(
@@ -171,7 +163,7 @@ def test_generate_deployment_environment(
                                             name="MY_ENV",
                                             valueFrom=kubernetes.ConfigMapKeyRef(
                                                 key="MY_ENV",
-                                                name="test-project-test-repository-test-branch-env",  # noqa: E501
+                                                name="test-repository-test-branch-env",  # noqa: E501
                                             ),
                                         )
                                     ],
@@ -198,9 +190,7 @@ def test_generate_deployment_environment(
             kubernetes.Deployment(
                 apiversion="apps/v1",
                 kind="Deployment",
-                metadata=Metadata(
-                    name="test-project-test-repository-test-branch", labels=make_labels()
-                ),
+                metadata=Metadata(name="test-repository-test-branch", labels=make_labels()),
                 spec=kubernetes.DeploymentSpec(
                     selector=kubernetes.Selector(matchLabels=make_labels()),
                     template=kubernetes.Template(
@@ -219,7 +209,7 @@ def test_generate_deployment_environment(
                                             name="MY_ENV",
                                             valueFrom=kubernetes.ConfigMapKeyRef(
                                                 key="MY_ENV",
-                                                name="test-project-test-repository-test-branch-env-docker",  # noqa: E501
+                                                name="test-repository-test-branch-env-docker",  # noqa: E501
                                             ),
                                         )
                                     ],

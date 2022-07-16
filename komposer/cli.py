@@ -8,7 +8,6 @@ from komposer.types.cli import Context, DeploymentContext, IngressContext
 from komposer.utils import dump_yaml
 
 DEFAULT_DOCKER_COMPOSE_FILENAME = Path("docker-compose.yml")
-DEFAULT_PROJECT_NAME = "default"
 DEFAULT_DOCKER_IMAGE = "${IMAGE}"
 
 
@@ -26,12 +25,7 @@ def output_raw_manifest(manifest: dict) -> None:
     type=click.Path(file_okay=True, dir_okay=False, resolve_path=True, path_type=Path),
     help=f"Path to the Docker compose file. Default is {DEFAULT_DOCKER_COMPOSE_FILENAME}.",
 )
-@click.option(
-    "--project-name",
-    "-p",
-    default=DEFAULT_PROJECT_NAME,
-    help=f"Name of the project. Default value is `{DEFAULT_PROJECT_NAME}`",
-)
+@click.option("--project-name", "-p", help="Name of the project")
 @click.option(
     "--repository-name", "-r", required=True, help="Name of the repository of this project"
 )

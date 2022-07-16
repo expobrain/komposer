@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 
 import pytest
 
@@ -7,19 +8,30 @@ from tests.fixtures import make_context
 
 
 @pytest.mark.parametrize(
-    "project_name, repository_name, branch_name, expected",
+    "repository_name, branch_name, project_name, expected",
     [
         pytest.param(
-            "my-project",
             "my-repository",
             "my-branch",
-            "my-project-my-repository-my-branch",
+            None,
+            "my-repository-my-branch",
             id="Simple repository and branch names",
+        ),
+        pytest.param(
+            "my-repository",
+            "my-branch",
+            "my-project",
+            "my-project-my-repository-my-branch",
+            id="With project name",
         ),
     ],
 )
 def test_context_manifest_prefix(
-    temporary_path: Path, project_name: str, repository_name: str, branch_name: str, expected: str
+    temporary_path: Path,
+    repository_name: str,
+    branch_name: str,
+    project_name: Optional[str],
+    expected: str,
 ) -> None:
     """
     GIVEN a project, repository and branch names

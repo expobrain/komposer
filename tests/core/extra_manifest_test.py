@@ -1,3 +1,4 @@
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Optional
 
@@ -44,7 +45,7 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
                     "apiVersion": "v1",
                     "kind": "Service",
                     "metadata": {
-                        "name": "test-project-test-repository-test-branch-service-1",
+                        "name": "test-repository-test-branch-service-1",
                         "labels": {
                             "app": "service-1",
                             "repository": "test-repository",
@@ -86,7 +87,7 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
                     "apiVersion": "v1",
                     "kind": "Job",
                     "metadata": {
-                        "name": "test-project-test-repository-test-branch-job-1",
+                        "name": "test-repository-test-branch-job-1",
                         "labels": {
                             "repository": "test-repository",
                             "branch": "test-branch",
@@ -99,7 +100,7 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
                                     {
                                         "args": [
                                             "ping",
-                                            "test-project-test-repository-test-branch-service=1}",
+                                            "test-repository-test-branch-service=1}",
                                         ],
                                     }
                                 ]
@@ -151,7 +152,7 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
                     "apiVersion": "v1",
                     "kind": "Service",
                     "metadata": {
-                        "name": "test-project-test-repository-test-branch-service-1",
+                        "name": "test-repository-test-branch-service-1",
                         "labels": {
                             "app": "service-1",
                             "repository": "test-repository",
@@ -169,7 +170,7 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
                                                 "valueFrom": {
                                                     "configMapKeyRef": {
                                                         "key": "MY_ENV",
-                                                        "name": "test-project-test-repository-test-branch-service-1",  # noqa: E501
+                                                        "name": "test-repository-test-branch-service-1",  # noqa: E501
                                                     }
                                                 },
                                             }
@@ -186,7 +187,7 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
     ],
 )
 def test_load_external_manifest(
-    context_with_extra_manifest: Context, extra_manifest: dict, expected: list[dict]
+    context_with_extra_manifest: Context, extra_manifest: Mapping, expected: Sequence[Mapping]
 ) -> None:
     """
     GIVEN a context with an extra manifest
