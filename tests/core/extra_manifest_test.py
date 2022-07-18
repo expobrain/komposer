@@ -148,6 +148,54 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
                 kind: List
                 items:
                 - apiVersion: v1
+                  kind: Job
+                  metadata:
+                    name: job-1
+                  spec:
+                    template:
+                      spec:
+                        containers:
+                        - args:
+                          - ping
+                          - ${KOMPOSER_SERVICE_PREFIX:-default}-service-1
+                """
+            ),
+            [
+                {
+                    "apiVersion": "v1",
+                    "kind": "Job",
+                    "metadata": {
+                        "name": "test-repository-test-branch-job-1",
+                        "labels": {
+                            "repository": "test-repository",
+                            "branch": "test-branch",
+                        },
+                    },
+                    "spec": {
+                        "template": {
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "args": [
+                                            "ping",
+                                            "test-repository-test-branch-service-1",
+                                        ],
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                }
+            ],
+            id="List with single item with ${KOMPOSER_SERVICE_PREFIX} env var with default",
+        ),
+        pytest.param(
+            textwrap.dedent(
+                """
+                apiVersion: v1
+                kind: List
+                items:
+                - apiVersion: v1
                   kind: Service
                   metadata:
                     name: service-1
