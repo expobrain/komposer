@@ -254,6 +254,59 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
             textwrap.dedent(
                 """
                 apiVersion: v1
+                kind: List
+                items:
+                - apiVersion: v1
+                  kind: Service
+                  metadata:
+                    name: service-1
+                    labels:
+                      app: service-1
+                  spec:
+                    template:
+                      spec:
+                        containers:
+                          - env:
+                            - name: MY_ENV
+                              value: my-value
+                """
+            ),
+            [
+                {
+                    "apiVersion": "v1",
+                    "kind": "Service",
+                    "metadata": {
+                        "name": "test-repository-test-branch-service-1",
+                        "labels": {
+                            "app": "service-1",
+                            "repository": "test-repository",
+                            "branch": "test-branch",
+                        },
+                    },
+                    "spec": {
+                        "template": {
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "env": [
+                                            {
+                                                "name": "MY_ENV",
+                                                "value": "my-value",
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                }
+            ],
+            id="List with single item with env from literals",
+        ),
+        pytest.param(
+            textwrap.dedent(
+                """
+                apiVersion: v1
                 kind: Service
                 metadata:
                     name: service-1

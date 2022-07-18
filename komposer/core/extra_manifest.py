@@ -33,7 +33,10 @@ def update_item_metadata_name(item: Mapping, manifest_prefix: str) -> None:
 def update_item_env_configmapkeyref_name(item: Mapping, manifest_prefix: str) -> None:
     containers = item.get("spec", {}).get("template", {}).get("spec", {}).get("containers", [])
     envs = itertools.chain(*(container.get("env", []) for container in containers))
-    config_map_key_refs = (env.get("valueFrom", {}).get("configMapKeyRef", {}) for env in envs)
+    config_map_key_refs = (env.get("valueFrom", {}).get("configMapKeyRef") for env in envs)
+    config_map_key_refs = (
+        config_map_key_ref for config_map_key_ref in config_map_key_refs if config_map_key_ref
+    )
 
     for config_map_key_ref in config_map_key_refs:
         config_map_key_ref["name"] = f"{manifest_prefix}-{config_map_key_ref['name']}"
