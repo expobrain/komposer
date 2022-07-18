@@ -1,6 +1,9 @@
 import itertools
+import os
 from collections.abc import Mapping, Sequence
 from typing import Any, Union
+
+from envsubst import envsubst
 
 from komposer.exceptions import (
     ExtraManifestInvalidYamlError,
@@ -16,7 +19,7 @@ def _komposer_service_prefix_value(context: Context) -> str:
     return context.manifest_prefix
 
 
-komposer_env_variables_map = {"${KOMPOSER_SERVICE_PREFIX}": _komposer_service_prefix_value}
+komposer_env_variables_map = {"KOMPOSER_SERVICE_PREFIX": _komposer_service_prefix_value}
 
 
 def update_item_metadata_labels(item: Mapping, labels: Mapping) -> None:
@@ -39,7 +42,9 @@ def update_item_env_configmapkeyref_name(item: Mapping, manifest_prefix: str) ->
 def replace_env_variables(context: Context, extra_manifest_str: str) -> str:
     for env_name, env_fn in komposer_env_variables_map.items():
         env_value = env_fn(context)
-        extra_manifest_str = extra_manifest_str.replace(env_name, env_value)
+        os.environ[env_name] = env_value
+
+        extra_manifest_str = envsubst(extra_manifest_str)
 
     return extra_manifest_str
 

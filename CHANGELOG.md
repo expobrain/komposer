@@ -1,3 +1,7 @@
+# v0.1.3
+
+- Better support for env variable substitution in manifest files.
+
 # v0.1.2
 
 - made the `--project-name` parameter optional
