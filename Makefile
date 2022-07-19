@@ -38,3 +38,6 @@ lint:
 
 test:
 	pytest -x --cov=core --cov=komposer --cov-fail-under=90
+
+serve:
+	mkdocs serve
