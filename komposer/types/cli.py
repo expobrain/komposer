@@ -39,7 +39,7 @@ class Context(ImmutableBaseModel):
     default_image: str
     project_name: Optional[str] = None
     ingress_for_service: Optional[str] = None
-    extra_manifest_path: Optional[Path] = None
+    extra_manifest_paths: list[Path]
     deployment: DeploymentContext
     ingress: IngressContext
 

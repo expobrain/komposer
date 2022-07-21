@@ -36,6 +36,8 @@ Path to the filename containing extra items to be bundled into the generater Kub
   items: [...]
   ```
 
+It can be used multiple times to add more than one extra manifest.
+
 ### --default-image
 
 The default image name to be used when no value is set in the Docker Compose for the `image` attribute of a service. Default is `${IMAGE}`

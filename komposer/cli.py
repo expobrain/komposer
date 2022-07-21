@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Optional
 
@@ -36,6 +37,7 @@ def output_raw_manifest(manifest: dict) -> None:
 @click.option(
     "--extra-manifest",
     type=click.Path(file_okay=True, dir_okay=False, resolve_path=True, path_type=Path),
+    multiple=True,
     help=(
         "Path to an extra manifest file with custom items to be merged. "
         "The manifest must be in a format where the root element is a Kubernetes List node. "
@@ -76,8 +78,8 @@ def main(
     repository_name: str,
     branch_name: str,
     default_image: str,
+    extra_manifest: Sequence[Path],
     ingress_for_service: Optional[str] = None,
-    extra_manifest: Optional[Path] = None,
     ingress_tls_file: Optional[Path] = None,
     deployment_annotations_file: Optional[Path] = None,
     deployment_service_account_name: Optional[Path] = None,
@@ -89,7 +91,7 @@ def main(
         repository_name=repository_name,
         default_image=default_image,
         ingress_for_service=ingress_for_service,
-        extra_manifest_path=extra_manifest,
+        extra_manifest_paths=extra_manifest,
         ingress=IngressContext(tls_path=ingress_tls_file),
         deployment=DeploymentContext(
             annotations_path=deployment_annotations_file,

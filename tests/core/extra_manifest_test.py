@@ -1,44 +1,49 @@
 import textwrap
 from collections.abc import Mapping, Sequence
 from pathlib import Path
+from tempfile import mkstemp
 
 import pytest
 
-from komposer.core.extra_manifest import load_extra_manifest
+from komposer.core.extra_manifest import load_extra_manifests
 from komposer.exceptions import (
     ExtraManifestException,
     ExtraManifestMissingMetadataError,
     ExtraManifestMissingNameError,
 )
-from komposer.types.cli import Context
 from tests.fixtures import make_context
 
 
-@pytest.fixture
-def context_with_extra_manifest(temporary_path: Path) -> Context:
-    return make_context(
-        temporary_path=temporary_path, extra_manifest_path=temporary_path / "extra_manifest.yaml"
-    )
+def write_content_to_path(base_path: Path, content: str) -> Path:
+    _, filename_str = mkstemp(dir=base_path, suffix=".yml")
+
+    filename = Path(filename_str)
+    filename.write_text(content)
+
+    return filename
 
 
 @pytest.mark.parametrize(
-    "extra_manifest, expected",
+    "extra_manifests, expected",
     [
-        pytest.param("", [], id="No content"),
+        pytest.param([""], [], id="No content"),
         pytest.param(
-            textwrap.dedent(
-                """
+            [
+                textwrap.dedent(
+                    """
                 apiversion: v1
                 kind: List
                 items: []
                 """
-            ),
+                )
+            ],
             [],
             id="Empty list",
         ),
         pytest.param(
-            textwrap.dedent(
-                """
+            [
+                textwrap.dedent(
+                    """
                 apiVersion: v1
                 kind: Service
                 metadata:
@@ -46,7 +51,8 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
                     labels:
                         app: service-1
                 """
-            ),
+                )
+            ],
             [
                 {
                     "apiVersion": "v1",
@@ -64,8 +70,9 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
             id="List with single item",
         ),
         pytest.param(
-            textwrap.dedent(
-                """
+            [
+                textwrap.dedent(
+                    """
                 apiVersion: v1
                 kind: List
                 items:
@@ -76,7 +83,8 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
                     labels:
                       app: service-1
                 """
-            ),
+                )
+            ],
             [
                 {
                     "apiVersion": "v1",
@@ -94,8 +102,9 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
             id="Kubernetes list with single item",
         ),
         pytest.param(
-            textwrap.dedent(
-                """
+            [
+                textwrap.dedent(
+                    """
                 apiVersion: v1
                 kind: List
                 items:
@@ -111,7 +120,8 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
                           - ping
                           - ${KOMPOSER_SERVICE_PREFIX}-service-1
                 """
-            ),
+                )
+            ],
             [
                 {
                     "apiVersion": "v1",
@@ -142,8 +152,9 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
             id="List with single item with ${KOMPOSER_SERVICE_PREFIX} env var",
         ),
         pytest.param(
-            textwrap.dedent(
-                """
+            [
+                textwrap.dedent(
+                    """
                 apiVersion: v1
                 kind: List
                 items:
@@ -159,7 +170,8 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
                           - ping
                           - ${KOMPOSER_SERVICE_PREFIX:-default}-service-1
                 """
-            ),
+                )
+            ],
             [
                 {
                     "apiVersion": "v1",
@@ -190,8 +202,9 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
             id="List with single item with ${KOMPOSER_SERVICE_PREFIX} env var with default",
         ),
         pytest.param(
-            textwrap.dedent(
-                """
+            [
+                textwrap.dedent(
+                    """
                 apiVersion: v1
                 kind: List
                 items:
@@ -212,7 +225,8 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
                                   key: MY_ENV
                                   name: service-1
                 """
-            ),
+                )
+            ],
             [
                 {
                     "apiVersion": "v1",
@@ -251,8 +265,9 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
             id="List with single item with env from config map",
         ),
         pytest.param(
-            textwrap.dedent(
-                """
+            [
+                textwrap.dedent(
+                    """
                 apiVersion: v1
                 kind: List
                 items:
@@ -270,7 +285,8 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
                             - name: MY_ENV
                               value: my-value
                 """
-            ),
+                )
+            ],
             [
                 {
                     "apiVersion": "v1",
@@ -304,8 +320,9 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
             id="List with single item with env from literals",
         ),
         pytest.param(
-            textwrap.dedent(
-                """
+            [
+                textwrap.dedent(
+                    """
                 apiVersion: v1
                 kind: Service
                 metadata:
@@ -313,7 +330,8 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
                     labels:
                         app: service-1
                 """
-            ),
+                )
+            ],
             [
                 {
                     "apiVersion": "v1",
@@ -331,8 +349,9 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
             id="Single item",
         ),
         pytest.param(
-            textwrap.dedent(
-                """
+            [
+                textwrap.dedent(
+                    """
                 ---
                 apiVersion: v1
                 kind: Service
@@ -341,7 +360,8 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
                     labels:
                         app: service-1
                 """
-            ),
+                )
+            ],
             [
                 {
                     "apiVersion": "v1",
@@ -358,24 +378,76 @@ def context_with_extra_manifest(temporary_path: Path) -> Context:
             ],
             id="Document with single item",
         ),
+        pytest.param(
+            [
+                textwrap.dedent(
+                    """
+                apiVersion: v1
+                kind: Service
+                metadata:
+                    name: service-1
+                    labels:
+                        app: service-1
+                """
+                ),
+                textwrap.dedent(
+                    """
+                apiVersion: v1
+                kind: Service
+                metadata:
+                    name: service-2
+                    labels:
+                        app: service-2
+                """
+                ),
+            ],
+            [
+                {
+                    "apiVersion": "v1",
+                    "kind": "Service",
+                    "metadata": {
+                        "name": "test-repository-test-branch-service-1",
+                        "labels": {
+                            "app": "service-1",
+                            "repository": "test-repository",
+                            "branch": "test-branch",
+                        },
+                    },
+                },
+                {
+                    "apiVersion": "v1",
+                    "kind": "Service",
+                    "metadata": {
+                        "name": "test-repository-test-branch-service-2",
+                        "labels": {
+                            "app": "service-2",
+                            "repository": "test-repository",
+                            "branch": "test-branch",
+                        },
+                    },
+                },
+            ],
+            id="Multiple extra manifest files",
+        ),
     ],
 )
-def test_load_external_manifest(
-    context_with_extra_manifest: Context, extra_manifest: str, expected: Sequence[Mapping]
+def test_load_external_manifests(
+    temporary_path: Path, extra_manifests: Sequence[str], expected: Sequence[Mapping]
 ) -> None:
     """
-    GIVEN a context with an extra manifest
-        AND an extra manifest's content
+    GIVEN an extra manifest's content
     WHEN we load the extra manifest
     THEN we get the expected manifest
     """
     # GIVEN
-    assert isinstance(context_with_extra_manifest.extra_manifest_path, Path)
+    extra_manifest_paths = [
+        write_content_to_path(temporary_path, extra_manifest) for extra_manifest in extra_manifests
+    ]
 
-    context_with_extra_manifest.extra_manifest_path.write_text(extra_manifest)
+    context = make_context(extra_manifest_paths=extra_manifest_paths)
 
     # WHEN
-    extra_items = load_extra_manifest(context_with_extra_manifest)
+    extra_items = load_extra_manifests(context)
 
     # THEN
     assert extra_items == expected
@@ -446,10 +518,8 @@ def test_load_external_manifest(
         ),
     ],
 )
-def test_load_external_manifest_fails(
-    context_with_extra_manifest: Context,
-    extra_manifest: str,
-    expected: type[ExtraManifestException],
+def test_load_external_manifests_fails(
+    temporary_path: Path, extra_manifest: str, expected: type[ExtraManifestException]
 ) -> None:
     """
     GIVEN a context with an extra manifest
@@ -459,11 +529,13 @@ def test_load_external_manifest_fails(
     THEN raises an exception
     """
     # GIVEN
-    assert isinstance(context_with_extra_manifest.extra_manifest_path, Path)
+    extra_manifest_path = temporary_path / "extra-manifest.yaml"
+    extra_manifest_path.write_text(extra_manifest)
 
-    # content = "" if extra_manifest is None else yaml.dump(extra_manifest)
-    context_with_extra_manifest.extra_manifest_path.write_text(extra_manifest)
+    context = make_context(
+        temporary_path=temporary_path, extra_manifest_paths=[extra_manifest_path]
+    )
 
     # WHEN
     with pytest.raises(expected):
-        load_extra_manifest(context_with_extra_manifest)
+        load_extra_manifests(context)

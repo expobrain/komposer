@@ -4,7 +4,7 @@ from yaml.parser import ParserError
 
 from komposer.core.config_map import generate_config_maps
 from komposer.core.deployment import generate_deployment
-from komposer.core.extra_manifest import load_extra_manifest
+from komposer.core.extra_manifest import load_extra_manifests
 from komposer.core.ingress import generate_ingress_from_services
 from komposer.core.service import generate_services
 from komposer.exceptions import (
@@ -121,7 +121,7 @@ def generate_manifest_from_docker_compose(context: Context) -> dict:
     ingress = generate_ingress_from_services(context, compose.services)
 
     # Load external manifest
-    extra_manifest = load_extra_manifest(context)
+    extra_manifest = load_extra_manifests(context)
 
     # Return manifest
     items = [*config_maps, deployment, *services]

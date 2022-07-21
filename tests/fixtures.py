@@ -21,13 +21,14 @@ def make_context(
     repository_name: str = TEST_REPOSITORY_NAME,
     default_image: str = DEFAULT_DOCKER_IMAGE,
     ingress_for_service: Optional[str] = None,
-    extra_manifest_path: Optional[Path] = None,
+    extra_manifest_paths: Optional[list[Path]] = None,
     ingress_tls_path: Optional[Path] = None,
     deployment_annotations_path: Optional[Path] = None,
     deployment_service_account_name: Optional[str] = None,
 ) -> Context:
     temporary_path = temporary_path or Path()
     docker_compose_path = docker_compose_path or (temporary_path / DEFAULT_DOCKER_COMPOSE_FILENAME)
+    extra_manifest_paths = extra_manifest_paths or []
 
     return Context(
         docker_compose_path=docker_compose_path,
@@ -36,7 +37,7 @@ def make_context(
         repository_name=repository_name,
         default_image=default_image,
         ingress_for_service=ingress_for_service,
-        extra_manifest_path=extra_manifest_path,
+        extra_manifest_paths=extra_manifest_paths,
         ingress=IngressContext(tls_path=ingress_tls_path),
         deployment=DeploymentContext(
             annotations_path=deployment_annotations_path,

@@ -69,7 +69,7 @@ def make_mandatory_short_args() -> list[str]:
             [*make_mandatory_long_args(), "--extra-manifest", Path("extra-manifest.yml")],
             make_context(
                 docker_compose_path=cli.DEFAULT_DOCKER_COMPOSE_FILENAME.resolve(),
-                extra_manifest_path=Path("extra-manifest.yml").resolve(),
+                extra_manifest_paths=[Path("extra-manifest.yml").resolve()],
             ),
             id="Extra manifest, long form",
         ),
