@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Optional
 
@@ -245,7 +245,7 @@ def test_ensure_service_name_lowercase_RFC_1123_fails(
 
 
 @pytest.mark.parametrize(
-    "context, compose, config_maps, deployment, services, extra_manifest, expected",
+    "context, compose, config_maps, deployment, services, extra_manifests, expected",
     [
         pytest.param(
             make_context(),
@@ -317,7 +317,7 @@ def test_ensure_service_name_lowercase_RFC_1123_fails(
             id="Single service with ingress",
         ),
         pytest.param(
-            make_context(extra_manifest_path=Path("extra.yaml")),
+            make_context(extra_manifest_paths=[Path("extra.yaml")]),
             make_minimal_docker_compose(),
             [],
             make_minimal_deployment(),
@@ -343,8 +343,8 @@ def test_generate_manifest_from_docker_compose(
     config_maps: Sequence[kubernetes.ConfigMap],
     deployment: kubernetes.Deployment,
     services: Sequence[kubernetes.Service],
-    extra_manifest: list[dict],
-    expected: dict,
+    extra_manifests: Sequence[Mapping],
+    expected: Mapping,
 ) -> None:
     """
     GIVEN a Docker Compose file
@@ -356,7 +356,7 @@ def test_generate_manifest_from_docker_compose(
     mocker.patch("komposer.core.base.generate_config_maps", return_value=config_maps)
     mocker.patch("komposer.core.base.generate_deployment", return_value=deployment)
     mocker.patch("komposer.core.base.generate_services", return_value=services)
-    mocker.patch("komposer.core.base.load_extra_manifest", return_value=extra_manifest)
+    mocker.patch("komposer.core.base.load_extra_manifests", return_value=extra_manifests)
 
     if context.ingress_for_service:
         mocker.patch(

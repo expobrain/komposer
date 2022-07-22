@@ -1,6 +1,11 @@
+# v0.1.5
+
+- the `--extra-manifest` parameter can now be used multiple times to add more than one manifest faile
+
 # v0.1.4
 
 - Fixed processing envs from extra manifests: handles simple envs without ConfigMap
+
 # v0.1.3
 
 - Better support for env variable substitution in manifest files.

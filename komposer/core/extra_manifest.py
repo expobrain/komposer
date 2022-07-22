@@ -88,22 +88,36 @@ def ensure_metadata_is_present(extra_manifest_items: Sequence[Mapping[str, Any]]
             )
 
 
-def load_extra_manifest(context: Context) -> list[dict]:
+def load_extra_manifests(context: Context) -> list[dict]:
     # Skip if no extra manifest
-    if context.extra_manifest_path is None:
+    if context.extra_manifest_paths is None:
         return []
 
     # Load manifest
-    extra_manifest_str = context.extra_manifest_path.read_text()
+    extra_manifests_str = list(
+        extra_manifest_path.read_text() for extra_manifest_path in context.extra_manifest_paths
+    )
 
     # Replace KOMPOSER_* env variables
-    extra_manifest_str = replace_env_variables(context, extra_manifest_str)
+    extra_manifests_str = list(
+        replace_env_variables(context, extra_manifest_str)
+        for extra_manifest_str in extra_manifests_str
+    )
 
     # Parse manifest
-    extra_manifest_raw = load_yaml(extra_manifest_str)
+    extra_manifests_raw = list(
+        load_yaml(extra_manifest_str) for extra_manifest_str in extra_manifests_str
+    )
 
     # Just validate that the format of the file
-    extra_manifest_items = get_items_from_extra_manifest(extra_manifest_raw)
+    extra_manifest_items: list[dict] = list(
+        itertools.chain(
+            *(
+                get_items_from_extra_manifest(extra_manifest_raw)
+                for extra_manifest_raw in extra_manifests_raw
+            )
+        )
+    )
 
     ensure_metadata_is_present(extra_manifest_items)
 
