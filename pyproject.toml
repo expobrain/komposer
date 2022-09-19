@@ -32,7 +32,7 @@ python-dotenv = ">=0.20,<0.22"
 envsubst = "^0.1.5"
 
 [tool.poetry.dev-dependencies]
-autoflake = "^1.5"
+autoflake = "^1.6"
 black = "^22.8"
 isort = "^5.10.1"
 mypy = "^0.971"
