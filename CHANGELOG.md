@@ -1,3 +1,7 @@
+# v0.1.6
+
+- fixed rendering `KOMPOSER_*` environment variables in the final manifest
+
 # v0.1.5
 
 - the `--extra-manifest` parameter can now be used multiple times to add more than one manifest file
