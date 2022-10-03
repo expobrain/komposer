@@ -1,9 +1,6 @@
 import itertools
-import os
 from collections.abc import Mapping, Sequence
 from typing import Any, Union
-
-from envsubst import envsubst
 
 from komposer.exceptions import (
     ExtraManifestInvalidYamlError,
@@ -13,13 +10,6 @@ from komposer.exceptions import (
 from komposer.types import kubernetes
 from komposer.types.cli import Context
 from komposer.utils import load_yaml
-
-
-def _komposer_service_prefix_value(context: Context) -> str:
-    return context.manifest_prefix
-
-
-komposer_env_variables_map = {"KOMPOSER_SERVICE_PREFIX": _komposer_service_prefix_value}
 
 
 def update_item_metadata_labels(item: Mapping, labels: Mapping) -> None:
@@ -40,16 +30,6 @@ def update_item_env_configmapkeyref_name(item: Mapping, manifest_prefix: str) ->
 
     for config_map_key_ref in config_map_key_refs:
         config_map_key_ref["name"] = f"{manifest_prefix}-{config_map_key_ref['name']}"
-
-
-def replace_env_variables(context: Context, extra_manifest_str: str) -> str:
-    for env_name, env_fn in komposer_env_variables_map.items():
-        env_value = env_fn(context)
-        os.environ[env_name] = env_value
-
-        extra_manifest_str = envsubst(extra_manifest_str)
-
-    return extra_manifest_str
 
 
 def get_items_from_extra_manifest(extra_manifest_raw: Union[Mapping, Sequence]) -> list[dict]:
@@ -94,23 +74,17 @@ def load_extra_manifests(context: Context) -> list[dict]:
         return []
 
     # Load manifest
-    extra_manifests_str = list(
+    extra_manifests_str = (
         extra_manifest_path.read_text() for extra_manifest_path in context.extra_manifest_paths
     )
 
-    # Replace KOMPOSER_* env variables
-    extra_manifests_str = list(
-        replace_env_variables(context, extra_manifest_str)
-        for extra_manifest_str in extra_manifests_str
-    )
-
     # Parse manifest
-    extra_manifests_raw = list(
+    extra_manifests_raw = (
         load_yaml(extra_manifest_str) for extra_manifest_str in extra_manifests_str
     )
 
     # Just validate that the format of the file
-    extra_manifest_items: list[dict] = list(
+    extra_manifest_items = list(
         itertools.chain(
             *(
                 get_items_from_extra_manifest(extra_manifest_raw)

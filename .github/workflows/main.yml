@@ -3,6 +3,9 @@ on: [push]
 jobs:
   testing-formatting-linting:
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.ref }}
+      cancel-in-progress: true
     strategy:
       matrix:
         python-version:

@@ -1,3 +1,4 @@
+import textwrap
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -7,6 +8,7 @@ from pytest_mock import MockerFixture
 
 from komposer import cli
 from komposer.types.cli import Context
+from komposer.utils import load_yaml
 from tests.fixtures import TEST_BRANCH_NAME, TEST_REPOSITORY_NAME, make_context
 
 
@@ -128,7 +130,76 @@ def test_main(mocker: MockerFixture, cli_args: Sequence[str], expected: Context)
     actual = runner.invoke(cli.main, cli_args)
 
     # THEN
-    print(actual.output)
     assert actual.exit_code == 0
 
     m_generate_manifest_from_docker_compose.assert_called_once_with(expected)
+
+
+@pytest.mark.parametrize(
+    "manifest, expected",
+    [
+        pytest.param(
+            textwrap.dedent(
+                """
+                    apiVersion: v1
+                    kind: List
+                    items:
+                    - apiVersion: v1
+                    kind: Job
+                    metadata:
+                        name: job-1
+                    spec:
+                        template:
+                        spec:
+                            containers:
+                            - args:
+                            - ping
+                            - ${KOMPOSER_SERVICE_PREFIX}-service-1
+                """
+            ),
+            textwrap.dedent(
+                """
+                    apiVersion: v1
+                    kind: List
+                    items:
+                    - apiVersion: v1
+                    kind: Job
+                    metadata:
+                        name: job-1
+                    spec:
+                        template:
+                        spec:
+                            containers:
+                            - args:
+                            - ping
+                            - test-repository-test-branch-service-1
+                """
+            ),
+            id="List with single item with ${KOMPOSER_SERVICE_PREFIX} env var",
+        )
+    ],
+)
+def test_output_raw_manifest(
+    mocker: MockerFixture, context: Context, manifest: str, expected: str
+) -> None:
+    """
+    GIVEN a prepared manifest
+    WHEN replacing the KOMPOSER_* env variables
+    THEN the fullin rendered manifest is returned
+    """
+    # GIVEN
+    manifest_dict = load_yaml(manifest)
+    expected_dict = load_yaml(expected)
+
+    m_print = mocker.patch("komposer.cli.print")
+
+    # WHEN
+    cli.output_raw_manifest(context, manifest_dict)
+
+    # THEN
+    assert m_print.call_count == 1
+    assert isinstance(m_print.call_args[0][0], str)
+
+    actual = load_yaml(m_print.call_args[0][0])
+
+    assert actual == expected_dict
