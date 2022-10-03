@@ -1,6 +1,6 @@
 # v0.1.5
 
-- the `--extra-manifest` parameter can now be used multiple times to add more than one manifest faile
+- the `--extra-manifest` parameter can now be used multiple times to add more than one manifest file
 
 # v0.1.4
 
