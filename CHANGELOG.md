@@ -1,4 +1,4 @@
-# v0.1.6
+# v0.1.7
 
 - fixed rendering `KOMPOSER_*` environment variables in the final manifest
 
