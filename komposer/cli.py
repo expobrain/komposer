@@ -5,6 +5,7 @@ from typing import Optional
 import click
 
 from komposer.core.base import generate_manifest_from_docker_compose
+from komposer.core.env_vars import replace_komposer_env_variables
 from komposer.types.cli import Context, DeploymentContext, IngressContext
 from komposer.utils import dump_yaml
 
@@ -12,9 +13,14 @@ DEFAULT_DOCKER_COMPOSE_FILENAME = Path("docker-compose.yml")
 DEFAULT_DOCKER_IMAGE = "${IMAGE}"
 
 
-def output_raw_manifest(manifest: dict) -> None:
+def output_raw_manifest(context: Context, manifest: dict) -> None:
+    # Convert manifest to string
     output = dump_yaml(manifest)
 
+    # Render KOMPOSER_* vars
+    output = replace_komposer_env_variables(context, output)
+
+    # Output manifest
     print(output)
 
 
@@ -101,7 +107,7 @@ def main(
 
     manifest_data = generate_manifest_from_docker_compose(context)
 
-    output_raw_manifest(manifest_data)
+    output_raw_manifest(context, manifest_data)
 
 
 if __name__ == "__main__":
