@@ -46,6 +46,10 @@ The default image name to be used when no value is set in the Docker Compose for
 
 Path to the file which contains the configuration fragment for the `spec.tls` section of an Ingress Kubernetes resource.
 
+### --ingress-domain
+
+The top level domain to be used in the ingress' hosts section of the Kubernetes resource.
+
 ### --deployment-annotations-file
 
 File containing the annotations to be added to the Kuberneted Deployment resource.

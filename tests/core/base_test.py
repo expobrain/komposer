@@ -5,6 +5,7 @@ from typing import Optional
 import pytest
 from pytest_mock import MockerFixture
 
+from komposer.cli import DEFAULT_INGRESS_DOMAIN
 from komposer.core.base import (
     ensure_deployment_annotations_is_valid_yaml,
     ensure_ingress_tls_is_valid_yaml,
@@ -77,9 +78,7 @@ def make_minimal_ingress() -> kubernetes.Ingress:
                 kubernetes.IngressTls(
                     hosts=[
                         (
-                            "my-service"
-                            ".test-project-test-repository-test-branch"
-                            ".svc.cluster.local"
+                            f"my-service.test-project-test-repository-test-branch.{DEFAULT_INGRESS_DOMAIN}"  # noqa: E501
                         )
                     ],
                     secretName="plum-app-tls-cert",
@@ -88,9 +87,7 @@ def make_minimal_ingress() -> kubernetes.Ingress:
             rules=[
                 kubernetes.IngressRule(
                     host=(
-                        "my-service"
-                        ".test-project-test-repository-test-branch"
-                        ".svc.cluster.local"
+                        f"my-service.test-project-test-repository-test-branch.{DEFAULT_INGRESS_DOMAIN}"  # noqa: E501
                     ),
                     http=kubernetes.HttpPaths(
                         paths=[

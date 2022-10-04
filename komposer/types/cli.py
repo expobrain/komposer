@@ -26,6 +26,7 @@ class DeploymentContext(ImmutableBaseModel):
 
 class IngressContext(ImmutableBaseModel):
     tls_path: Optional[Path] = None
+    domain: str
 
     @property
     def tls(self) -> Optional[Any]:

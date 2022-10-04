@@ -1,3 +1,8 @@
+# v0.1.8
+
+- added the `--ingress-domain` CLI option to specify the ingress top level domain
+- added the `KOMPOSER_INGRESS_DOMAIN` environment variable which is set to the same value of the `--ingress-domain` CLI option
+
 # v0.1.7
 
 - fixed rendering `KOMPOSER_*` environment variables in the final manifest

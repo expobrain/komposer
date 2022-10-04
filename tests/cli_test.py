@@ -176,7 +176,56 @@ def test_main(mocker: MockerFixture, cli_args: Sequence[str], expected: Context)
                 """
             ),
             id="List with single item with ${KOMPOSER_SERVICE_PREFIX} env var",
-        )
+        ),
+        pytest.param(
+            textwrap.dedent(
+                """
+                    - apiVersion: networking.k8s.io/v1
+                      kind: Ingress
+                      spec:
+                        ingressClassName: nginx-internal
+                        rules:
+                          - host: api.repository-name-branch-name.${KOMPOSER_INGRESS_DOMAIN}
+                            http:
+                              paths:
+                                - backend:
+                                    service:
+                                      name: repository-name-branch-name-api
+                                      port:
+                                        number: 8080
+                                  path: /
+                                  pathType: Prefix
+                        tls:
+                          - hosts:
+                              - api.repository-name-branch-name.${KOMPOSER_INGRESS_DOMAIN}
+                            secretName: app-tls-cert
+                """
+            ),
+            textwrap.dedent(
+                f"""
+                    - apiVersion: networking.k8s.io/v1
+                      kind: Ingress
+                      spec:
+                        ingressClassName: nginx-internal
+                        rules:
+                          - host: api.repository-name-branch-name.{cli.DEFAULT_INGRESS_DOMAIN}
+                            http:
+                              paths:
+                                - backend:
+                                    service:
+                                      name: repository-name-branch-name-api
+                                      port:
+                                        number: 8080
+                                  path: /
+                                  pathType: Prefix
+                        tls:
+                          - hosts:
+                              - api.repository-name-branch-name.{cli.DEFAULT_INGRESS_DOMAIN}
+                            secretName: app-tls-cert
+                """
+            ),
+            id="Single item with ${KOMPOSER_INGRESS_DOMAIN} env var",
+        ),
     ],
 )
 def test_output_raw_manifest(

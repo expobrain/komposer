@@ -8,7 +8,6 @@ from komposer.utils import to_kubernetes_name
 DEFAULT_INGRESS_ANNOTATIONS: kubernetes.Annotations = {
     "cert-manager.io/cluster-issuer": "letsencrypt-prod"
 }
-DEFAULT_CLUSTER_NAME = "svc.cluster.local"
 
 
 def generate_ingress_path(
@@ -39,7 +38,7 @@ def generate_ingress_host(context: Context) -> str:
         [
             to_kubernetes_name(context.ingress_for_service),
             context.manifest_prefix,
-            DEFAULT_CLUSTER_NAME,
+            context.ingress.domain,
         ]
     )
 
