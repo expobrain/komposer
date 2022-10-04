@@ -11,6 +11,7 @@ from komposer.utils import dump_yaml
 
 DEFAULT_DOCKER_COMPOSE_FILENAME = Path("docker-compose.yml")
 DEFAULT_DOCKER_IMAGE = "${IMAGE}"
+DEFAULT_INGRESS_DOMAIN = "svc.cluster.local"
 
 
 def output_raw_manifest(context: Context, manifest: dict) -> None:
@@ -68,6 +69,14 @@ def output_raw_manifest(context: Context, manifest: dict) -> None:
     ),
 )
 @click.option(
+    "--ingress-domain",
+    default=DEFAULT_INGRESS_DOMAIN,
+    help=(
+        "Specify the top level domain to be used for the Ingress. "
+        f"Default is {DEFAULT_INGRESS_DOMAIN}"
+    ),
+)
+@click.option(
     "--deployment-annotations-file",
     type=click.Path(file_okay=True, dir_okay=False, resolve_path=True, path_type=Path),
     help=(
@@ -84,6 +93,7 @@ def main(
     repository_name: str,
     branch_name: str,
     default_image: str,
+    ingress_domain: str,
     extra_manifest: Sequence[Path],
     ingress_for_service: Optional[str] = None,
     ingress_tls_file: Optional[Path] = None,
@@ -98,7 +108,7 @@ def main(
         default_image=default_image,
         ingress_for_service=ingress_for_service,
         extra_manifest_paths=extra_manifest,
-        ingress=IngressContext(tls_path=ingress_tls_file),
+        ingress=IngressContext(domain=ingress_domain, tls_path=ingress_tls_file),
         deployment=DeploymentContext(
             annotations_path=deployment_annotations_file,
             service_account_name=deployment_service_account_name,

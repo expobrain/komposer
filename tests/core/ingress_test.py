@@ -5,6 +5,7 @@ from typing import Any, Optional
 import pytest
 import yaml
 
+from komposer.cli import DEFAULT_INGRESS_DOMAIN
 from komposer.core.ingress import generate_ingress_from_services
 from komposer.exceptions import ServiceNotFoundError
 from komposer.types import docker_compose, kubernetes
@@ -14,10 +15,11 @@ from tests.fixtures import make_context, make_labels
 
 
 @pytest.mark.parametrize(
-    "services, ingress_tls, expected",
+    "services, ingress_domain, ingress_tls, expected",
     [
         pytest.param(
             {"my_service": docker_compose.Service(command="python run.py")},
+            None,
             None,
             kubernetes.Ingress(
                 metadata=Metadata(
@@ -30,7 +32,7 @@ from tests.fixtures import make_context, make_labels
                     rules=[
                         IngressRule(
                             host=(
-                                "my-service" ".test-repository-test-branch" ".svc.cluster.local"
+                                f"my-service.test-repository-test-branch.{DEFAULT_INGRESS_DOMAIN}"
                             ),
                             http=kubernetes.HttpPaths(paths=[]),
                         )
@@ -41,9 +43,10 @@ from tests.fixtures import make_context, make_labels
         ),
         pytest.param(
             {"my_service": docker_compose.Service(command="python run.py")},
+            None,
             [
                 {
-                    "hosts": ["api.test-repository-test-branch.svc.cluster.local"],
+                    "hosts": [f"api.test-repository-test-branch.{DEFAULT_INGRESS_DOMAIN}"],
                     "secretName": "app-tls-cert",
                 }
             ],
@@ -56,14 +59,14 @@ from tests.fixtures import make_context, make_labels
                 spec=kubernetes.IngressSpec(
                     tls=[
                         {
-                            "hosts": ["api.test-repository-test-branch.svc.cluster.local"],
+                            "hosts": [f"api.test-repository-test-branch.{DEFAULT_INGRESS_DOMAIN}"],
                             "secretName": "app-tls-cert",
                         }
                     ],
                     rules=[
                         IngressRule(
                             host=(
-                                "my-service" ".test-repository-test-branch" ".svc.cluster.local"
+                                f"my-service.test-repository-test-branch.{DEFAULT_INGRESS_DOMAIN}"
                             ),
                             http=kubernetes.HttpPaths(paths=[]),
                         )
@@ -74,6 +77,7 @@ from tests.fixtures import make_context, make_labels
         ),
         pytest.param(
             {"my_service": docker_compose.Service(command="python run.py", ports=["8080"])},
+            None,
             None,
             kubernetes.Ingress(
                 metadata=Metadata(
@@ -86,7 +90,7 @@ from tests.fixtures import make_context, make_labels
                     rules=[
                         IngressRule(
                             host=(
-                                "my-service" ".test-repository-test-branch" ".svc.cluster.local"
+                                f"my-service.test-repository-test-branch.{DEFAULT_INGRESS_DOMAIN}"
                             ),
                             http=kubernetes.HttpPaths(
                                 paths=[
@@ -111,6 +115,7 @@ from tests.fixtures import make_context, make_labels
         pytest.param(
             {"my_service": docker_compose.Service(command="python run.py", ports=["8080:9000"])},
             None,
+            None,
             kubernetes.Ingress(
                 metadata=Metadata(
                     name="test-repository-test-branch-my-service",
@@ -122,7 +127,7 @@ from tests.fixtures import make_context, make_labels
                     rules=[
                         IngressRule(
                             host=(
-                                "my-service" ".test-repository-test-branch" ".svc.cluster.local"
+                                f"my-service.test-repository-test-branch.{DEFAULT_INGRESS_DOMAIN}"
                             ),
                             http=kubernetes.HttpPaths(
                                 paths=[
@@ -144,11 +149,34 @@ from tests.fixtures import make_context, make_labels
             ),
             id="Service with double ports",
         ),
+        pytest.param(
+            {"my_service": docker_compose.Service(command="python run.py")},
+            "dev.mydomain.com",
+            None,
+            kubernetes.Ingress(
+                metadata=Metadata(
+                    name="test-repository-test-branch-my-service",
+                    labels=make_labels(),
+                    annotations={"cert-manager.io/cluster-issuer": "letsencrypt-prod"},
+                ),
+                spec=kubernetes.IngressSpec(
+                    tls=None,
+                    rules=[
+                        IngressRule(
+                            host=("my-service.test-repository-test-branch.dev.mydomain.com"),
+                            http=kubernetes.HttpPaths(paths=[]),
+                        )
+                    ],
+                ),
+            ),
+            id="Service with custom ingress domain",
+        ),
     ],
 )
 def test_generate_ingress_from_service(
     temporary_path: Path,
     services: docker_compose.Services,
+    ingress_domain: Optional[str],
     ingress_tls: Optional[Sequence[Mapping[str, Any]]],
     expected: kubernetes.Ingress,
 ) -> None:
@@ -165,7 +193,11 @@ def test_generate_ingress_from_service(
     else:
         ingress_tls_path = None
 
-    context = make_context(ingress_for_service="my_service", ingress_tls_path=ingress_tls_path)
+    context = make_context(
+        ingress_for_service="my_service",
+        ingress_domain=ingress_domain,
+        ingress_tls_path=ingress_tls_path,
+    )
 
     # WHEN
     actual = generate_ingress_from_services(context, services)
