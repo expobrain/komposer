@@ -185,7 +185,7 @@ def test_output_raw_manifest(
     """
     GIVEN a prepared manifest
     WHEN replacing the KOMPOSER_* env variables
-    THEN the fullin rendered manifest is returned
+    THEN the full rendered manifest is returned
     """
     # GIVEN
     manifest_dict = load_yaml(manifest)

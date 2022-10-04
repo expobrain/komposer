@@ -174,5 +174,5 @@ which will generate the same Kubernetes manifest above plus an Ingress resource:
 
 ## Limitations
 
-- only one Kubernetes Ingress can be defined for a service, generatint more than one Kubernetes Ingress is not supported yet
+- only one Kubernetes Ingress can be defined for a service, generating more than one Kubernetes Ingress is not supported yet
 - port mapping defined in Docker Compose file are not supported, this is a limitation imposed by the different networking between Docker Compose and a Kubernetes Pod
