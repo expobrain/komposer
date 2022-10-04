@@ -36,7 +36,7 @@ The service prefix is the concatenation of `[<project-name>-]<repository-name>-<
 
 This is useful to be able to reference services in extra manifest files because the prefix is not known until the manifest is generated.
 
-In this exampel, an extra manifest containing a job to migrate a database with Alembic points to a service using the `KOMPOSER_SERVICE_PREFIX` environment variable:
+In this example, an extra manifest containing a job to migrate a database with Alembic points to a service using the `KOMPOSER_SERVICE_PREFIX` environment variable:
 
 ```yaml
 apiVersion: batch/v1
