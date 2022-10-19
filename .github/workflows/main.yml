@@ -4,7 +4,7 @@ jobs:
   testing-formatting-linting:
     runs-on: ubuntu-latest
     concurrency:
-      group: ${{ github.ref }}
+      group: ${{ github.head_ref }}-${{ matrix.python-version }}
       cancel-in-progress: true
     strategy:
       matrix:
