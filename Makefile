@@ -1,4 +1,4 @@
-.SILENT: fmt check lint
+.SILENT: fmt check lint bandit
 
 fmt:
 	find . -type d -name ".venv" -prune -o -print -type f -name "*.py" \
@@ -16,7 +16,11 @@ fmt:
 	isort --profile black .
 	black .
 
-check:
+bandit:
+	bandit -q -r komposer
+	bandit -q -lll -r tests
+
+check: bandit
 	find . -type d -name ".venv" -prune -o -print -type f -name "*.py" \
 		-exec pyupgrade \
 			--keep-runtime-typing \
@@ -32,7 +36,7 @@ check:
 	isort --profile black -c .
 	black --check .
 
-lint:
+lint: bandit
 	mypy komposer
 	flake8 .
 
