@@ -49,6 +49,7 @@ flake8-bugbear = "^22.9.23"
 pytest-mock = "^3.9.0"
 mkdocs-material = "^8.5.6"
 mkdocs-mermaid2-plugin = "^0.6.0"
+bandit = "^1.7.4"
 
 [tool.poetry.scripts]
 komposer = "komposer.cli:main"
