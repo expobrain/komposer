@@ -29,7 +29,6 @@ pydantic = "^1.9.1"
 PyYAML = "^6.0"
 stringcase = "^1.2.0"
 python-dotenv = ">=0.20"
-envsubst = "^0.1.5"
 
 [tool.poetry.group.dev.dependencies]
 autoflake = "^1.6"

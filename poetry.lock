@@ -152,14 +152,6 @@ optional = false
 python-versions = "*"
 
 [[package]]
-name = "envsubst"
-version = "0.1.5"
-description = "Substitute environment variables in a string"
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "fancycompleter"
 version = "0.9.1"
 description = "colorful TAB completion for Python prompt"
@@ -903,7 +895,7 @@ testing = ["func-timeout", "jaraco.itertools", "pytest (>=6)", "pytest-black (>=
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "b5bfa1f74aa53945083b7bb69eed5425220dbd7dcacf21c0db50b4b9861baa2a"
+content-hash = "e7e11b97d754464ad1a739f2ef2b411038e01290366de0e937d72f35aef01b32"
 
 [metadata.files]
 attrs = [
@@ -1013,10 +1005,6 @@ coverage = [
 editorconfig = [
     {file = "EditorConfig-0.12.3-py3-none-any.whl", hash = "sha256:6b0851425aa875b08b16789ee0eeadbd4ab59666e9ebe728e526314c4a2e52c1"},
     {file = "EditorConfig-0.12.3.tar.gz", hash = "sha256:57f8ce78afcba15c8b18d46b5170848c88d56fd38f05c2ec60dbbfcb8996e89e"},
-]
-envsubst = [
-    {file = "envsubst-0.1.5-py2.py3-none-any.whl", hash = "sha256:7188f9f2a046e45b63098ce5a7fd84126cbe9e5b73b8ff78eaf6e32122c0caaf"},
-    {file = "envsubst-0.1.5.tar.gz", hash = "sha256:d8e402984a84dda4ea7a8a1f7afe1c41e54a1257cfb74c80cb8f991053d97b9b"},
 ]
 fancycompleter = [
     {file = "fancycompleter-0.9.1-py3-none-any.whl", hash = "sha256:dd076bca7d9d524cc7f25ec8f35ef95388ffef9ef46def4d3d25e9b044ad7080"},
