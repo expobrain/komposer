@@ -18,7 +18,9 @@ jobs:
         with:
           path: |
             ~/.cache/pip
+            .venv
           key: ${{ runner.os }}-3.10-${{ hashFiles('**/poetry.lock') }}
-      - run: pip install poetry
-      - run: poetry install
+      - run: pip install poetry~=1.2
+      - run: poetry config virtualenvs.in-project true
+      - run: poetry install --sync
       - run: poetry run mkdocs gh-deploy --force
