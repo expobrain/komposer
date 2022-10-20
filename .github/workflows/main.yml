@@ -4,7 +4,7 @@ jobs:
   testing-formatting-linting:
     runs-on: ubuntu-latest
     concurrency:
-      group: ${{ github.head_ref }}-${{ matrix.python-version }}
+      group: ${{ github.ref_name }}-${{ matrix.python-version }}
       cancel-in-progress: true
     strategy:
       matrix:
@@ -21,9 +21,11 @@ jobs:
         with:
           path: |
             ~/.cache/pip
+            .venv
           key: ${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
-      - run: pip install poetry
-      - run: poetry install
+      - run: pip install poetry~=1.2
+      - run: poetry config virtualenvs.in-project true
+      - run: poetry install --sync
       - run: poetry run make test
       - run: poetry run make check
 
@@ -41,8 +43,9 @@ jobs:
         with:
           path: |
             ~/.cache/pip
+            .venv
           key: ${{ runner.os }}-3.10-${{ hashFiles('**/poetry.lock') }}
-      - run: pip install poetry
+      - run: pip install poetry~=1.2
       - run: poetry build
       # From https://packaging.python.org/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/#publishing-the-distribution-to-pypi-and-testpypi
       - name: Publish distribution 📦 to PyPI
