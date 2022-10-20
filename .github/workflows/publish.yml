@@ -9,7 +9,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     concurrency:
-      group: ${{ github.head_ref }}-docs
+      group: ${{ github.ref_name }}-docs
       cancel-in-progress: true
     steps:
       - uses: actions/checkout@v3
