@@ -1,7 +1,6 @@
 import os
 
-from envsubst import envsubst
-
+from komposer.envsubst import envsubst
 from komposer.types.cli import Context
 
 

@@ -1,3 +1,7 @@
+# v0.1.9
+
+- fixed substituting only environment variables with the `KOMPOSER_*` prefix variables in the Kubernetes manifest instead of any environment variable
+
 # v0.1.8
 
 - added the `--ingress-domain` CLI option to specify the ingress top level domain
