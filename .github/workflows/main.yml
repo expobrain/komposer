@@ -1,7 +1,24 @@
 name: Unit testing, formatting & linting
 on: [push]
 jobs:
-  testing-formatting-linting:
+  linting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - name: Cache multiple paths
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.cache/pre-commit
+          key: ${{ runner.os }}-3.11-${{ hashFiles('**/.pre-commit-config.yaml') }}
+      - run: pip install pre-commit~=2.20
+      - run: pre-commit run -a
+
+  testing:
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.ref_name }}-${{ matrix.python-version }}
@@ -24,15 +41,17 @@ jobs:
             ~/.cache/pip
             .venv
           key: ${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
-      - run: pip install poetry~=1.2
+      - run: pip install poetry~=1.3
       - run: poetry config virtualenvs.in-project true
       - run: poetry install --sync
-      - run: poetry run make test
-      - run: poetry run make check
+      - run: make test
+      - run: make mypy
 
   publish_package:
     runs-on: ubuntu-latest
-    needs: testing-formatting-linting
+    needs:
+      - testing
+      - linting
     if: startsWith(github.ref, 'refs/tags')
     steps:
       - uses: actions/checkout@v3
