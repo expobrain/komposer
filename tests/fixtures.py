@@ -13,7 +13,7 @@ TEST_BRANCH_NAME = "test-branch"
 TEST_REPOSITORY_NAME = "test-repository"
 
 
-def make_labels() -> dict[str, str]:
+def make_labels() -> dict[str, Optional[str]]:
     return {"repository": TEST_REPOSITORY_NAME, "branch": TEST_BRANCH_NAME}
 
 

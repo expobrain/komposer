@@ -15,7 +15,7 @@ from tests.fixtures import make_labels
     [
         pytest.param(
             docker_compose.DockerCompose(
-                services={"my_service": docker_compose.Service(env_file=".env")}
+                services={"my_service": docker_compose.Service(env_file=Path(".env"))}
             )
         )
     ],

@@ -58,10 +58,10 @@ from tests.fixtures import make_context, make_labels
                 ),
                 spec=kubernetes.IngressSpec(
                     tls=[
-                        {
-                            "hosts": [f"api.test-repository-test-branch.{DEFAULT_INGRESS_DOMAIN}"],
-                            "secretName": "app-tls-cert",
-                        }
+                        kubernetes.IngressTls(  # type: ignore[call-arg]
+                            hosts=[f"api.test-repository-test-branch.{DEFAULT_INGRESS_DOMAIN}"],
+                            secretName="app-tls-cert",
+                        )
                     ],
                     rules=[
                         IngressRule(
@@ -94,8 +94,8 @@ from tests.fixtures import make_context, make_labels
                             ),
                             http=kubernetes.HttpPaths(
                                 paths=[
-                                    kubernetes.HttpPath(
-                                        path="/",
+                                    kubernetes.HttpPath(  # type: ignore[call-arg]
+                                        path=Path("/"),
                                         pathType=kubernetes.PathType.PREFIX,
                                         backend=kubernetes.Backend(
                                             service=kubernetes.ServiceRef(
@@ -131,8 +131,8 @@ from tests.fixtures import make_context, make_labels
                             ),
                             http=kubernetes.HttpPaths(
                                 paths=[
-                                    kubernetes.HttpPath(
-                                        path="/",
+                                    kubernetes.HttpPath(  # type: ignore[call-arg]
+                                        path=Path("/"),
                                         pathType=kubernetes.PathType.PREFIX,
                                         backend=kubernetes.Backend(
                                             service=kubernetes.ServiceRef(
