@@ -49,10 +49,6 @@ class Metadata(UnnamedMetadata):
         }
 
     @staticmethod
-    def from_context(context: Context, annotations: Optional[Annotations] = None) -> Metadata:
-        return Metadata(labels=Metadata.labels_from_context(context), annotations=annotations)
-
-    @staticmethod
     def from_context_with_suffix(
         context: Context, suffix: str, annotations: Optional[Annotations] = None
     ) -> Metadata:
