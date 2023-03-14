@@ -98,7 +98,7 @@ def main(
     ingress_for_service: Optional[str] = None,
     ingress_tls_file: Optional[Path] = None,
     deployment_annotations_file: Optional[Path] = None,
-    deployment_service_account_name: Optional[Path] = None,
+    deployment_service_account_name: Optional[str] = None,
 ) -> None:
     context = Context(
         docker_compose_path=compose_file,
@@ -107,7 +107,7 @@ def main(
         repository_name=repository_name,
         default_image=default_image,
         ingress_for_service=ingress_for_service,
-        extra_manifest_paths=extra_manifest,
+        extra_manifest_paths=list(extra_manifest),
         ingress=IngressContext(domain=ingress_domain, tls_path=ingress_tls_file),
         deployment=DeploymentContext(
             annotations_path=deployment_annotations_file,

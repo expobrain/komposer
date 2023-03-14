@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Optional
 
 from komposer.exceptions import ServiceNotFoundError
@@ -17,8 +18,8 @@ def generate_ingress_path(
     service_name_kubernetes = to_kubernetes_name(service_name)
 
     http_path = kubernetes.HttpPath(
-        path="/",
-        pathType=kubernetes.PathType.PREFIX,
+        path=Path("/"),
+        pathType=kubernetes.PathType.PREFIX,  # type: ignore[call-arg]
         backend=kubernetes.Backend(
             service=kubernetes.ServiceRef(
                 name=f"{context.manifest_prefix}-{service_name_kubernetes}",

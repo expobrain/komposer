@@ -49,10 +49,6 @@ class Metadata(UnnamedMetadata):
         }
 
     @staticmethod
-    def from_context(context: Context, annotations: Optional[Annotations] = None) -> Metadata:
-        return Metadata(labels=Metadata.labels_from_context(context), annotations=annotations)
-
-    @staticmethod
     def from_context_with_suffix(
         context: Context, suffix: str, annotations: Optional[Annotations] = None
     ) -> Metadata:
@@ -114,7 +110,8 @@ class ConfigMapEnvironmentVariable(CamelCaseImmutableBaseModel):
 
         for key in keys:
             yield ConfigMapEnvironmentVariable(
-                name=key, valueFrom=ConfigMapKeyRef(key=key, name=config_map_name)
+                name=key,
+                valueFrom=ConfigMapKeyRef(key=key, name=config_map_name),  # type: ignore[call-arg]
             )
 
 
@@ -140,9 +137,12 @@ class ContainerPort(CamelCaseImmutableBaseModel):
         ports = Ports.from_string(string)
 
         if ports.same_ports():
-            return ContainerPort(containerPort=ports.container)
+            return ContainerPort(containerPort=ports.container)  # type: ignore[call-arg]
 
-        return ContainerPort(containerPort=ports.container, hostPort=ports.host)
+        return ContainerPort(  # type: ignore[call-arg]
+            containerPort=ports.container,
+            hostPort=ports.host,
+        )
 
 
 class Container(CamelCaseImmutableBaseModel):
@@ -188,7 +188,11 @@ class ServicePort(CamelCaseImmutableBaseModel):
         ports = Ports.from_string(string)
         name = to_kubernetes_name(string)
 
-        return ServicePort(name=name, targetPort=ports.container, port=ports.host)
+        return ServicePort(
+            name=name,
+            targetPort=ports.container,  # type: ignore[call-arg]
+            port=ports.host,
+        )
 
 
 class ServiceSpec(CamelCaseImmutableBaseModel):
