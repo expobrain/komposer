@@ -38,7 +38,7 @@ def make_minimal_docker_compose(ports: Optional[list[str]] = None) -> docker_com
 
 
 def make_minimal_service() -> kubernetes.Service:
-    return kubernetes.Service(  # type: ignore[call-arg]
+    return kubernetes.Service(
         apiVersion="v1",
         kind="Service",
         metadata=kubernetes.Metadata(
@@ -49,15 +49,15 @@ def make_minimal_service() -> kubernetes.Service:
 
 
 def make_minimal_deployment() -> kubernetes.Deployment:
-    return kubernetes.Deployment(  # type: ignore[call-arg]
+    return kubernetes.Deployment(
         apiVersion="apps/v1",
         kind="Deployment",
         metadata=kubernetes.Metadata(
             name="test-project-test-repository-test-branch", labels=make_labels()
         ),
-        spec=kubernetes.DeploymentSpec(  # type: ignore[call-arg]
+        spec=kubernetes.DeploymentSpec(
             hostAliases=[],
-            selector=kubernetes.Selector(matchLabels=make_labels()),  # type: ignore[call-arg]
+            selector=kubernetes.Selector(matchLabels=make_labels()),
             template=kubernetes.Template(
                 metadata=kubernetes.UnnamedMetadata(labels=make_labels()),
                 spec=kubernetes.TemplateSpec(),
@@ -75,7 +75,7 @@ def make_minimal_ingress() -> kubernetes.Ingress:
         ),
         spec=kubernetes.IngressSpec(
             tls=[
-                kubernetes.IngressTls(  # type: ignore[call-arg]
+                kubernetes.IngressTls(
                     hosts=[
                         (
                             f"my-service.test-project-test-repository-test-branch.{DEFAULT_INGRESS_DOMAIN}"  # noqa: E501
@@ -91,7 +91,7 @@ def make_minimal_ingress() -> kubernetes.Ingress:
                     ),
                     http=kubernetes.HttpPaths(
                         paths=[
-                            kubernetes.HttpPath(  # type: ignore[call-arg]
+                            kubernetes.HttpPath(
                                 path=Path("/"),
                                 pathType=kubernetes.PathType.PREFIX,
                                 backend=kubernetes.Backend(

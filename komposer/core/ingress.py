@@ -19,7 +19,7 @@ def generate_ingress_path(
 
     http_path = kubernetes.HttpPath(
         path=Path("/"),
-        pathType=kubernetes.PathType.PREFIX,  # type: ignore[call-arg]
+        pathType=kubernetes.PathType.PREFIX,
         backend=kubernetes.Backend(
             service=kubernetes.ServiceRef(
                 name=f"{context.manifest_prefix}-{service_name_kubernetes}",

@@ -17,15 +17,13 @@ from tests.fixtures import make_context, make_labels
     [
         pytest.param(
             {},
-            kubernetes.Deployment(  # type: ignore[call-arg]
+            kubernetes.Deployment(
                 apiversion="v1",
                 kind="Deployment",
                 metadata=Metadata(name="test-repository-test-branch", labels=make_labels()),
-                spec=kubernetes.DeploymentSpec(  # type: ignore[call-arg]
+                spec=kubernetes.DeploymentSpec(
                     hostAliases=[],
-                    selector=kubernetes.Selector(
-                        matchLabels=make_labels()  # type: ignore[call-arg]
-                    ),
+                    selector=kubernetes.Selector(matchLabels=make_labels()),
                     template=kubernetes.Template(
                         metadata=UnnamedMetadata(labels=make_labels()),
                         spec=kubernetes.TemplateSpec(),
@@ -43,17 +41,15 @@ from tests.fixtures import make_context, make_labels
                     image="my_image:latest",
                 )
             },
-            kubernetes.Deployment(  # type: ignore[call-arg]
+            kubernetes.Deployment(
                 apiversion="v1",
                 kind="Deployment",
                 metadata=Metadata(name="test-repository-test-branch", labels=make_labels()),
-                spec=kubernetes.DeploymentSpec(  # type: ignore[call-arg]
-                    selector=kubernetes.Selector(
-                        matchLabels=make_labels(),  # type: ignore[call-arg]
-                    ),
+                spec=kubernetes.DeploymentSpec(
+                    selector=kubernetes.Selector(matchLabels=make_labels()),
                     template=kubernetes.Template(
                         metadata=UnnamedMetadata(labels=make_labels()),
-                        spec=kubernetes.TemplateSpec(  # type: ignore[call-arg]
+                        spec=kubernetes.TemplateSpec(
                             hostAliases=[
                                 kubernetes.HostAlias(ip="127.0.0.1", hostnames=["my_service"])
                             ],
@@ -67,11 +63,7 @@ from tests.fixtures import make_context, make_labels
                                             name="MY_ENV", value="my-value"
                                         )
                                     ],
-                                    ports=[
-                                        kubernetes.ContainerPort(  # type: ignore[call-arg]
-                                            containerPort=8080,
-                                        )
-                                    ],
+                                    ports=[kubernetes.ContainerPort(containerPort=8080)],
                                 )
                             ],
                         ),
@@ -89,17 +81,15 @@ from tests.fixtures import make_context, make_labels
                     image="my_image:latest",
                 )
             },
-            kubernetes.Deployment(  # type: ignore[call-arg]
+            kubernetes.Deployment(
                 apiversion="v1",
                 kind="Deployment",
                 metadata=Metadata(name="test-repository-test-branch", labels=make_labels()),
-                spec=kubernetes.DeploymentSpec(  # type: ignore[call-arg]
-                    selector=kubernetes.Selector(
-                        matchLabels=make_labels(),  # type: ignore[call-arg]
-                    ),
+                spec=kubernetes.DeploymentSpec(
+                    selector=kubernetes.Selector(matchLabels=make_labels()),
                     template=kubernetes.Template(
                         metadata=UnnamedMetadata(labels=make_labels()),
-                        spec=kubernetes.TemplateSpec(  # type: ignore[call-arg]
+                        spec=kubernetes.TemplateSpec(
                             hostAliases=[
                                 kubernetes.HostAlias(ip="127.0.0.1", hostnames=["my_service"])
                             ],
@@ -114,9 +104,7 @@ from tests.fixtures import make_context, make_labels
                                         )
                                     ],
                                     ports=[
-                                        kubernetes.ContainerPort(  # type: ignore[call-arg]
-                                            containerPort=8080,
-                                        ),
+                                        kubernetes.ContainerPort(containerPort=8080),
                                     ],
                                 )
                             ],
@@ -155,17 +143,17 @@ def test_generate_deployment_environment(
                 """
             ),
             Path(".env"),
-            kubernetes.Deployment(  # type: ignore[call-arg]
+            kubernetes.Deployment(
                 apiversion="apps/v1",
                 kind="Deployment",
                 metadata=Metadata(name="test-repository-test-branch", labels=make_labels()),
                 spec=kubernetes.DeploymentSpec(
                     selector=kubernetes.Selector(
-                        matchLabels=make_labels(),  # type: ignore[call-arg]
+                        matchLabels=make_labels(),
                     ),
                     template=kubernetes.Template(
                         metadata=UnnamedMetadata(labels=make_labels()),
-                        spec=kubernetes.TemplateSpec(  # type: ignore[call-arg]
+                        spec=kubernetes.TemplateSpec(
                             hostAliases=[
                                 kubernetes.HostAlias(ip="127.0.0.1", hostnames=["my_service"])
                             ],
@@ -177,9 +165,9 @@ def test_generate_deployment_environment(
                                     env=[
                                         kubernetes.ConfigMapEnvironmentVariable(
                                             name="MY_ENV",
-                                            valueFrom=kubernetes.ConfigMapKeyRef(  # type: ignore[call-arg] # noqa: E501
+                                            valueFrom=kubernetes.ConfigMapKeyRef(
                                                 key="MY_ENV",
-                                                name="test-repository-test-branch-env",  # noqa: E501
+                                                name="test-repository-test-branch-env",
                                             ),
                                         )
                                     ],
@@ -203,17 +191,15 @@ def test_generate_deployment_environment(
                 """
             ),
             Path(".env.docker"),
-            kubernetes.Deployment(  # type: ignore[call-arg]
+            kubernetes.Deployment(
                 apiversion="apps/v1",
                 kind="Deployment",
                 metadata=Metadata(name="test-repository-test-branch", labels=make_labels()),
-                spec=kubernetes.DeploymentSpec(  # type: ignore[call-arg]
-                    selector=kubernetes.Selector(
-                        matchLabels=make_labels()  # type: ignore[call-arg]
-                    ),
+                spec=kubernetes.DeploymentSpec(
+                    selector=kubernetes.Selector(matchLabels=make_labels()),
                     template=kubernetes.Template(
                         metadata=UnnamedMetadata(labels=make_labels()),
-                        spec=kubernetes.TemplateSpec(  # type: ignore[call-arg]
+                        spec=kubernetes.TemplateSpec(
                             hostAliases=[
                                 kubernetes.HostAlias(ip="127.0.0.1", hostnames=["my_service"])
                             ],
@@ -225,9 +211,9 @@ def test_generate_deployment_environment(
                                     env=[
                                         kubernetes.ConfigMapEnvironmentVariable(
                                             name="MY_ENV",
-                                            valueFrom=kubernetes.ConfigMapKeyRef(  # type: ignore[call-arg] # noqa: E501
+                                            valueFrom=kubernetes.ConfigMapKeyRef(
                                                 key="MY_ENV",
-                                                name="test-repository-test-branch-env-docker",  # noqa: E501
+                                                name="test-repository-test-branch-env-docker",
                                             ),
                                         )
                                     ],

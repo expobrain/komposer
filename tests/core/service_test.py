@@ -26,11 +26,7 @@ from tests.fixtures import make_labels
                     ),
                     spec=kubernetes.ServiceSpec(
                         ports=[
-                            kubernetes.ServicePort(
-                                name="8080-8080",
-                                port=8080,
-                                targetPort=8080,  # type: ignore[call-arg]
-                            )
+                            kubernetes.ServicePort(name="8080-8080", port=8080, targetPort=8080)
                         ],
                         selector=make_labels(),
                     ),
@@ -50,13 +46,7 @@ from tests.fixtures import make_labels
                         annotations=None,
                     ),
                     spec=kubernetes.ServiceSpec(
-                        ports=[
-                            kubernetes.ServicePort(
-                                name="8080",
-                                port=8080,
-                                targetPort=8080,  # type: ignore[call-arg]
-                            )
-                        ],
+                        ports=[kubernetes.ServicePort(name="8080", port=8080, targetPort=8080)],
                         selector=make_labels(),
                     ),
                 )

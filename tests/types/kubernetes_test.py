@@ -18,21 +18,17 @@ from tests.fixtures import TEST_BRANCH_NAME, TEST_REPOSITORY_NAME, make_context
     [
         pytest.param(
             "8080",
-            ContainerPort(  # type: ignore[call-arg]
-                containerPort=8080,
-            ),
+            ContainerPort(containerPort=8080),
             id="Single port",
         ),
         pytest.param(
             "8080:8080",
-            ContainerPort(  # type: ignore[call-arg]
-                containerPort=8080,
-            ),
+            ContainerPort(containerPort=8080),
             id="host:container that matches",
         ),
         pytest.param(
             "5434:5432",
-            ContainerPort(containerPort=5432, hostPort=5434),  # type: ignore[call-arg]
+            ContainerPort(containerPort=5432, hostPort=5434),
             id="Different host:container ports",
         ),
     ],
@@ -55,17 +51,17 @@ def test_container_port_from_string(string: str, expected: ContainerPort) -> Non
     [
         pytest.param(
             "8080",
-            ServicePort(name="8080", port=8080, targetPort=8080),  # type: ignore[call-arg]
+            ServicePort(name="8080", port=8080, targetPort=8080),
             id="Single port",
         ),
         pytest.param(
             "8080:8080",
-            ServicePort(name="8080-8080", port=8080, targetPort=8080),  # type: ignore[call-arg]
+            ServicePort(name="8080-8080", port=8080, targetPort=8080),
             id="host:container that matches",
         ),
         pytest.param(
             "5434:5432",
-            ServicePort(name="5434-5432", port=5434, targetPort=5432),  # type: ignore[call-arg]
+            ServicePort(name="5434-5432", port=5434, targetPort=5432),
             id="Different host:container ports",
         ),
     ],
