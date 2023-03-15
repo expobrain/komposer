@@ -59,12 +59,7 @@ def test_generate_container_environment_no_env_variables(
                     name="my-service",
                     image=DEFAULT_DOCKER_IMAGE,
                     args=["python", "run.py"],
-                    ports=[
-                        kubernetes.ContainerPort(  # type: ignore[call-arg]
-                            containerPort=5432,
-                            hostPort=5434,
-                        )
-                    ],
+                    ports=[kubernetes.ContainerPort(containerPort=5432, hostPort=5434)],
                 )
             ],
             id="Service with port mapping",

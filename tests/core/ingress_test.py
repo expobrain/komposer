@@ -58,7 +58,7 @@ from tests.fixtures import make_context, make_labels
                 ),
                 spec=kubernetes.IngressSpec(
                     tls=[
-                        kubernetes.IngressTls(  # type: ignore[call-arg]
+                        kubernetes.IngressTls(
                             hosts=[f"api.test-repository-test-branch.{DEFAULT_INGRESS_DOMAIN}"],
                             secretName="app-tls-cert",
                         )
@@ -94,7 +94,7 @@ from tests.fixtures import make_context, make_labels
                             ),
                             http=kubernetes.HttpPaths(
                                 paths=[
-                                    kubernetes.HttpPath(  # type: ignore[call-arg]
+                                    kubernetes.HttpPath(
                                         path=Path("/"),
                                         pathType=kubernetes.PathType.PREFIX,
                                         backend=kubernetes.Backend(
@@ -131,7 +131,7 @@ from tests.fixtures import make_context, make_labels
                             ),
                             http=kubernetes.HttpPaths(
                                 paths=[
-                                    kubernetes.HttpPath(  # type: ignore[call-arg]
+                                    kubernetes.HttpPath(
                                         path=Path("/"),
                                         pathType=kubernetes.PathType.PREFIX,
                                         backend=kubernetes.Backend(
