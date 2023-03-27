@@ -850,17 +850,18 @@ dev = ["pre-commit", "pytest-asyncio", "tox"]
 
 [[package]]
 name = "pytest-testmon"
-version = "1.3.3"
+version = "2.0.2"
 description = "selects tests affected by changed files and methods"
 category = "dev"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 files = [
-    {file = "pytest-testmon-1.3.3.tar.gz", hash = "sha256:0ac839c089bdf99740418759a33971d3dacc695cf719acde4b967f7f88d1102c"},
+    {file = "pytest-testmon-2.0.2.tar.gz", hash = "sha256:cd364f6fdc446b0d94b1efe7b1bea0919348177e1dca0d3b06123ece621bffec"},
+    {file = "pytest_testmon-2.0.2-py3-none-any.whl", hash = "sha256:500d24a498460f421d6dfb13c722764c3079ac9f72a916e86701f025b7dc6d37"},
 ]
 
 [package.dependencies]
-coverage = ">=5,<7"
+coverage = ">=6,<8"
 pytest = ">=5,<8"
 
 [[package]]
@@ -1270,4 +1271,4 @@ testing = ["func-timeout", "jaraco.itertools", "pytest (>=6)", "pytest-black (>=
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "438c4b79a080246e0028ca1e34545fc0804a8d4d62a026b633a4f152b689f66e"
+content-hash = "e797e44119be68440c4a95e68b69984e38546e52f9eced9978a3918682fad799"
