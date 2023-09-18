@@ -45,7 +45,7 @@ repos:
           - flake8-bugbear
           - flake8-datetime-utcnow-plugin
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.10.1
+    rev: v3.11.0
     hooks:
       - id: pyupgrade
         args:
@@ -74,7 +74,7 @@ repos:
           - "-lll"
           - "tests"
   - repo: https://github.com/psf/black
-    rev: 23.9.0
+    rev: 23.9.1
     hooks:
       - id: black
   - repo: https://github.com/pre-commit/pygrep-hooks
