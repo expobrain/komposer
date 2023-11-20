@@ -44,7 +44,7 @@ def get_items_from_extra_manifest(extra_manifest_raw: Union[Mapping, Sequence]) 
     # Returns if it's a object
     if isinstance(extra_manifest_raw, dict):
         if extra_manifest_raw.get("kind") == "List":
-            return extra_manifest_raw.get("items", [])
+            return extra_manifest_raw.get("items", [])  # type: ignore[no-any-return]
 
         return [extra_manifest_raw]
 
