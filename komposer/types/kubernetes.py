@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import ABC
 from collections.abc import Iterable
 from enum import Enum, unique
 from io import StringIO
@@ -68,7 +69,7 @@ class Metadata(UnnamedMetadata):
         )
 
 
-class Item(CamelCaseImmutableBaseModel):
+class Item(CamelCaseImmutableBaseModel, ABC):
     api_version: str
     kind: str
     metadata: Metadata
@@ -117,7 +118,7 @@ class ConfigMapEnvironmentVariable(CamelCaseImmutableBaseModel):
 
 class EnvironmentVariable(CamelCaseImmutableBaseModel):
     name: str
-    value: Optional[str]
+    value: Optional[str] = None
 
     @staticmethod
     def from_string(string: str) -> Iterable[EnvironmentVariable]:
@@ -255,5 +256,4 @@ class Ingress(Item):
 class List(CamelCaseImmutableBaseModel):
     api_version: Literal["v1"] = "v1"
     kind: Literal["List"] = "List"
-    # We should be able to use Field(..., discriminator="kind") here
-    items: list[Item] = []
+    items: list[Union[ConfigMap, Deployment, Service, Ingress]] = []

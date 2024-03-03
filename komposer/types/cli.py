@@ -2,7 +2,7 @@ import re
 from pathlib import Path
 from typing import Any, Optional
 
-from pydantic import validator
+from pydantic import field_validator
 
 from komposer.types.base import ImmutableBaseModel
 from komposer.utils import load_yaml
@@ -44,20 +44,23 @@ class Context(ImmutableBaseModel):
     deployment: DeploymentContext
     ingress: IngressContext
 
-    @validator("project_name")
+    @field_validator("project_name")
+    @classmethod
     def project_name_matches_kubernetes_name(cls, value: Optional[str]) -> Optional[str]:
         if value is not None:
             ensure_lowercase_kebab(value)
 
         return value
 
-    @validator("branch_name")
+    @field_validator("branch_name")
+    @classmethod
     def branch_name_matches_kubernetes_name(cls, value: str) -> str:
         ensure_lowercase_kebab(value)
 
         return value
 
-    @validator("repository_name")
+    @field_validator("repository_name")
+    @classmethod
     def repository_name_matches_kubernetes_name(cls, value: str) -> str:
         ensure_lowercase_kebab(value)
 

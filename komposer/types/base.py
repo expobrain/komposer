@@ -1,7 +1,7 @@
 from typing import cast
 
 import stringcase
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 def to_camel(string: str) -> str:
@@ -9,11 +9,8 @@ def to_camel(string: str) -> str:
 
 
 class ImmutableBaseModel(BaseModel):
-    class Config:
-        allow_mutation = False
+    model_config = ConfigDict(frozen=True)
 
 
 class CamelCaseImmutableBaseModel(BaseModel):
-    class Config:
-        allow_mutation = False
-        alias_generator = to_camel
+    model_config = ConfigDict(frozen=True, alias_generator=to_camel)

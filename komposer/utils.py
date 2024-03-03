@@ -65,4 +65,4 @@ def command_to_args(command: Optional[Union[str, list[str]]]) -> Optional[list[s
 
 
 def as_json_object(type_: BaseModel) -> dict[str, Any]:
-    return cast(dict[str, Any], json.loads(type_.json(by_alias=True)))
+    return cast(dict[str, Any], json.loads(type_.model_dump_json(by_alias=True)))
