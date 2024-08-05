@@ -7,6 +7,7 @@ For more info:
 >>> from envsubst import envsubst
 >>> help(envsubst)
 """
+
 # MIT License
 #
 # Copyright (c) 2019 Alex Shafer
