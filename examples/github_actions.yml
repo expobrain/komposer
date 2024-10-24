@@ -1,0 +1,124 @@
+name: "Komposer deploy example"
+
+env:
+  SERVICE_NAME: "service-example"
+  GCLOUD_SDK_VERSION: "386.0.0"
+  PYTHON_VERSION: "3.10"
+  POETRY_VERSION: "1.1.15"
+  GKE_PROJECT_ID: "my-project-id"
+  GKE_CLUSTER: "my-cluster-name"
+
+on:
+  pull_request:
+
+jobs:
+  build-push:
+    runs-on: ubuntu
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build and push
+        run: |
+          sha=${GITHUB_SHA::7}
+          image=${{ env.SERVICE_NAME }}:${sha}
+
+          docker build -t "$image" .
+          docker push "$image"
+
+  clean-dev-resources:
+    steps:
+      - uses: actions/checkout@v3
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v0.8.0
+        with:
+          credentials_json: ${{ secrets.GKE_JSON_KEY }}
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.6.0
+        with:
+          version: ${{ env.GCLOUD_SDK_VERSION }}
+          project_id: ${{ env.GKE_PROJECT_ID }}
+      - name: Set cluster credentials
+        env:
+          PROJECT_ID: ${{ env.GKE_PROJECT_ID }}
+          GKE_CLUSTER: ${{ env.GKE_CLUSTER }}
+        run: |
+          gcloud container clusters get-credentials \
+              --project $GKE_PROJECT_ID \
+              $GKE_CLUSTER
+      - name: Clean up dev resources
+        run: |
+          # Set variables
+          export branch_name=$( echo ${{ github.ref_name }} | tr '[:upper:]' '[:lower:]' | tr -c '[:alnum:]' '-' | sed 's/.$//' )
+          export repository_name=$( echo ${{ github.repository }} | cut -d'/' -f2)
+
+          # Delete resources
+          kubectl delete job -l repository=$repository_name,branch=$branch_name
+          kubectl delete deployment -l repository=$repository_name,branch=$branch_name
+          kubectl delete service -l repository=$repository_name,branch=$branch_name
+          kubectl delete ingress -l repository=$repository_name,branch=$branch_name
+          kubectl delete configmap -l repository=$repository_name,branch=$branch_name
+
+  deploy-dev:
+    needs:
+      - clean-dev-resources
+      - build-push
+    steps:
+      - uses: actions/checkout@v3
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v0.8.0
+        with:
+          credentials_json: ${{ secrets.GKE_JSON_KEY }}
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.6.0
+        with:
+          version: ${{ env.GCLOUD_SDK_VERSION }}
+          project_id: ${{ env.GKE_PROJECT_ID }}
+      - name: Set cluster credentials
+        env:
+          PROJECT_ID: ${{ env.GKE_PROJECT_ID }}
+          GKE_CLUSTER: ${{ env.GKE_CLUSTER }}
+        run: |
+          gcloud container clusters get-credentials \
+              --project $GKE_PROJECT_ID \
+              $GKE_CLUSTER
+      - uses: actions/setup-python@v3
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Cache multiple Pips
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pip
+          key: ${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('**/poetry.lock') }}
+      - name: install dependencies
+        run: |
+          pip install 'poetry== ${{ env.POETRY_VERSION }}'
+          poetry install
+      - name: Generate dev manifest
+        run: |
+          # Set variables
+          export branch_name=$( echo ${{ github.ref_name }} | tr '[:upper:]' '[:lower:]' | tr -c '[:alnum:]' '-' | sed 's/.$//' )
+          export repository_name=$( echo ${{ github.repository }} | cut -d'/' -f2)
+
+          # Generate dev manifest
+          poetry run komposer \
+            --repository-name $repository_name \
+            --branch-name $branch_name \
+          > dev-deploy-template.yaml
+      - name: Deploy dev manifest
+        run: |
+          # Set variables
+          export branch_name=$( echo ${{ github.ref_name }} | tr '[:upper:]' '[:lower:]' | tr -c '[:alnum:]' '-' | sed 's/.$//' )
+          export repository_name=$( echo ${{ github.repository }} | cut -d'/' -f2)
+          export sha=${GITHUB_SHA::7}
+          export image="${{ env.SERVICE_NAME }}:${sha}"
+
+          # Render the manifest
+          cat dev-deploy-template.yaml | envsubst '${image}' > dev-deploy.yaml
+
+          # Deploy service
+          cat dev-deploy.yaml | kubectl apply -l pre-deploy!=yes -f -
+
+          for i in $(kubectl get deployments -l repository=$repository_name,branch=$branch_name -o name)
+          do
+            kubectl rollout status "$i" --timeout=300s
+          done
