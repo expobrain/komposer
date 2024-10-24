@@ -15,7 +15,7 @@ jobs:
             ~/.cache/pip
             ~/.cache/pre-commit
           key: ${{ runner.os }}-3.11-${{ hashFiles('**/.pre-commit-config.yaml') }}
-      - run: pip install pre-commit~=2.20
+      - run: pip install -U pre-commit
       - run: pre-commit run -a
 
   testing:
