@@ -77,9 +77,7 @@ def make_minimal_ingress() -> kubernetes.Ingress:
             tls=[
                 kubernetes.IngressTls(
                     hosts=[
-                        (
-                            f"my-service.test-project-test-repository-test-branch.{DEFAULT_INGRESS_DOMAIN}"  # noqa: E501
-                        )
+                        f"my-service.test-project-test-repository-test-branch.{DEFAULT_INGRESS_DOMAIN}"  # noqa: E501
                     ],
                     secretName="plum-app-tls-cert",
                 )
