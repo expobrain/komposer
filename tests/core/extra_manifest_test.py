@@ -28,31 +28,23 @@ def write_content_to_path(base_path: Path, content: str) -> Path:
     [
         pytest.param([""], [], id="No content"),
         pytest.param(
-            [
-                textwrap.dedent(
-                    """
+            [textwrap.dedent("""
                 apiversion: v1
                 kind: List
                 items: []
-                """
-                )
-            ],
+                """)],
             [],
             id="Empty list",
         ),
         pytest.param(
-            [
-                textwrap.dedent(
-                    """
+            [textwrap.dedent("""
                 apiVersion: v1
                 kind: Service
                 metadata:
                     name: service-1
                     labels:
                         app: service-1
-                """
-                )
-            ],
+                """)],
             [
                 {
                     "apiVersion": "v1",
@@ -70,9 +62,7 @@ def write_content_to_path(base_path: Path, content: str) -> Path:
             id="List with single item",
         ),
         pytest.param(
-            [
-                textwrap.dedent(
-                    """
+            [textwrap.dedent("""
                 apiVersion: v1
                 kind: List
                 items:
@@ -82,9 +72,7 @@ def write_content_to_path(base_path: Path, content: str) -> Path:
                     name: service-1
                     labels:
                       app: service-1
-                """
-                )
-            ],
+                """)],
             [
                 {
                     "apiVersion": "v1",
@@ -102,9 +90,7 @@ def write_content_to_path(base_path: Path, content: str) -> Path:
             id="Kubernetes list with single item",
         ),
         pytest.param(
-            [
-                textwrap.dedent(
-                    """
+            [textwrap.dedent("""
                 apiVersion: v1
                 kind: List
                 items:
@@ -124,9 +110,7 @@ def write_content_to_path(base_path: Path, content: str) -> Path:
                                 configMapKeyRef:
                                   key: MY_ENV
                                   name: service-1
-                """
-                )
-            ],
+                """)],
             [
                 {
                     "apiVersion": "v1",
@@ -165,9 +149,7 @@ def write_content_to_path(base_path: Path, content: str) -> Path:
             id="List with single item with env from config map",
         ),
         pytest.param(
-            [
-                textwrap.dedent(
-                    """
+            [textwrap.dedent("""
                 apiVersion: v1
                 kind: List
                 items:
@@ -184,9 +166,7 @@ def write_content_to_path(base_path: Path, content: str) -> Path:
                           - env:
                             - name: MY_ENV
                               value: my-value
-                """
-                )
-            ],
+                """)],
             [
                 {
                     "apiVersion": "v1",
@@ -220,18 +200,14 @@ def write_content_to_path(base_path: Path, content: str) -> Path:
             id="List with single item with env from literals",
         ),
         pytest.param(
-            [
-                textwrap.dedent(
-                    """
+            [textwrap.dedent("""
                 apiVersion: v1
                 kind: Service
                 metadata:
                     name: service-1
                     labels:
                         app: service-1
-                """
-                )
-            ],
+                """)],
             [
                 {
                     "apiVersion": "v1",
@@ -249,9 +225,7 @@ def write_content_to_path(base_path: Path, content: str) -> Path:
             id="Single item",
         ),
         pytest.param(
-            [
-                textwrap.dedent(
-                    """
+            [textwrap.dedent("""
                 ---
                 apiVersion: v1
                 kind: Service
@@ -259,9 +233,7 @@ def write_content_to_path(base_path: Path, content: str) -> Path:
                     name: service-1
                     labels:
                         app: service-1
-                """
-                )
-            ],
+                """)],
             [
                 {
                     "apiVersion": "v1",
@@ -280,26 +252,22 @@ def write_content_to_path(base_path: Path, content: str) -> Path:
         ),
         pytest.param(
             [
-                textwrap.dedent(
-                    """
+                textwrap.dedent("""
                 apiVersion: v1
                 kind: Service
                 metadata:
                     name: service-1
                     labels:
                         app: service-1
-                """
-                ),
-                textwrap.dedent(
-                    """
+                """),
+                textwrap.dedent("""
                 apiVersion: v1
                 kind: Service
                 metadata:
                     name: service-2
                     labels:
                         app: service-2
-                """
-                ),
+                """),
             ],
             [
                 {
@@ -358,61 +326,51 @@ def test_load_external_manifests(
     [
         pytest.param("{}", ExtraManifestMissingMetadataError, id="No content"),
         pytest.param(
-            textwrap.dedent(
-                """
+            textwrap.dedent("""
                 apiVersion: v1
                 kind: List
                 items:
                 - apiVersion: v1
                   kind: Service
-                """
-            ),
+                """),
             ExtraManifestMissingMetadataError,
             id="Item in Kubernetes List without metadata",
         ),
         pytest.param(
-            textwrap.dedent(
-                """
+            textwrap.dedent("""
                 ---
                 apiVersion: v1
                 kind: Service
-                """
-            ),
+                """),
             ExtraManifestMissingMetadataError,
             id="Item in list without metadata",
         ),
         pytest.param(
-            textwrap.dedent(
-                """
+            textwrap.dedent("""
                 apiVersion: v1
                 kind: Service
-                """
-            ),
+                """),
             ExtraManifestMissingMetadataError,
             id="Item without metadata",
         ),
         pytest.param(
-            textwrap.dedent(
-                """
+            textwrap.dedent("""
                 apiVersion: v1
                 kind: List
                 items:
                 - apiVersion: v1
                   kind: Service
                   metadata: {}
-                """
-            ),
+                """),
             ExtraManifestMissingNameError,
             id="Item in Kubernetes List without name",
         ),
         pytest.param(
-            textwrap.dedent(
-                """
+            textwrap.dedent("""
                 apiVersion: v1
                 kind: Service
                 metadata: {}
-                """
-            ),
+                """),
             ExtraManifestMissingNameError,
             id="Item without name",
         ),
