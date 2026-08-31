@@ -13,8 +13,7 @@ from komposer.utils import dump_yaml, to_kubernetes_name
     "compose_content, expected",
     [
         pytest.param(
-            textwrap.dedent(
-                """
+            textwrap.dedent("""
                 services:
                     my_service:
                         image: my-docker-hub/my-image:latest
@@ -22,8 +21,7 @@ from komposer.utils import dump_yaml, to_kubernetes_name
                         - "8080:8080"
                         command: ./scripts/my-script.sh
                         env_file: .env.dockercompose
-            """
-            ),
+            """),
             DockerCompose(
                 services={
                     "my_service": Service(
@@ -37,8 +35,7 @@ from komposer.utils import dump_yaml, to_kubernetes_name
             id="Single service with image+ports+env_file",
         ),
         pytest.param(
-            textwrap.dedent(
-                """
+            textwrap.dedent("""
                 services:
                     my_service:
                         image: my-docker-hub/my-image:latest
@@ -47,8 +44,7 @@ from komposer.utils import dump_yaml, to_kubernetes_name
                         command: ./scripts/my-script.sh
                         environment:
                         - MY_ENV_VARIABLE=my-value
-            """
-            ),
+            """),
             DockerCompose(
                 services={
                     "my_service": Service(
@@ -62,8 +58,7 @@ from komposer.utils import dump_yaml, to_kubernetes_name
             id="Single service with image+ports+environment as array",
         ),
         pytest.param(
-            textwrap.dedent(
-                """
+            textwrap.dedent("""
                 services:
                     my_service:
                         image: my-docker-hub/my-image:latest
@@ -72,8 +67,7 @@ from komposer.utils import dump_yaml, to_kubernetes_name
                         command: ./scripts/my-script.sh
                         environment:
                             MY_ENV_VARIABLE: my-value
-            """
-            ),
+            """),
             DockerCompose(
                 services={
                     "my_service": Service(
@@ -87,14 +81,12 @@ from komposer.utils import dump_yaml, to_kubernetes_name
             id="Single service with image+ports+environment as map",
         ),
         pytest.param(
-            textwrap.dedent(
-                """
+            textwrap.dedent("""
                 services:
                     my_service:
                         build: .
                         command: ./scripts/my-script.sh
-            """
-            ),
+            """),
             DockerCompose(services={"my_service": Service(command="./scripts/my-script.sh")}),
             id="Single service",
         ),
@@ -148,13 +140,11 @@ def test_to_kubernetes_name(string: str, expected: str) -> None:
     [
         pytest.param(
             {"key": "first line\nsecond line"},
-            textwrap.dedent(
-                """
+            textwrap.dedent("""
                 key: |-
                   first line
                   second line
-                """
-            ).lstrip(),
+                """).lstrip(),
         )
     ],
 )

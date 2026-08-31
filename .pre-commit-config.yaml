@@ -26,7 +26,7 @@ repos:
           - --autofix
       - id: trailing-whitespace
   - repo: https://github.com/myint/autoflake
-    rev: v2.3.1
+    rev: v2.4.0
     hooks:
       - id: autoflake
         args:
@@ -45,18 +45,18 @@ repos:
           - flake8-bugbear
           - flake8-datetime-utcnow-plugin
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.20.0
+    rev: v3.21.2
     hooks:
       - id: pyupgrade
         args:
           - "--py39-plus"
           - "--keep-runtime-typing"
   - repo: https://github.com/pycqa/isort
-    rev: 6.0.1
+    rev: 9.0.1
     hooks:
       - id: isort
   - repo: https://github.com/pycqa/bandit
-    rev: 1.8.6
+    rev: 1.9.4
     hooks:
       - id: bandit
         args:
@@ -65,7 +65,7 @@ repos:
           - "--exclude"
           - "tests"
   - repo: https://github.com/pycqa/bandit
-    rev: 1.8.6
+    rev: 1.9.4
     hooks:
       - id: bandit
         args:
@@ -74,7 +74,7 @@ repos:
           - "-lll"
           - "tests"
   - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 25.1.0
+    rev: 26.5.1
     hooks:
       - id: black
   - repo: https://github.com/pre-commit/pygrep-hooks
