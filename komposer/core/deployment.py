@@ -11,7 +11,7 @@ def generate_host_aliases(services: docker_compose.Services) -> list[kubernetes.
     if not services:
         return []
 
-    host_names = [service_name for service_name in services.keys()]
+    host_names = [*services.keys()]
     host_aliases = kubernetes.HostAlias(hostnames=host_names, ip=LOCALHOST)
 
     return [host_aliases]

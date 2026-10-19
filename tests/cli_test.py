@@ -139,8 +139,7 @@ def test_main(mocker: MockerFixture, cli_args: Sequence[str], expected: Context)
     "manifest, expected",
     [
         pytest.param(
-            textwrap.dedent(
-                """
+            textwrap.dedent("""
                     apiVersion: v1
                     kind: List
                     items:
@@ -155,10 +154,8 @@ def test_main(mocker: MockerFixture, cli_args: Sequence[str], expected: Context)
                             - args:
                             - ping
                             - ${KOMPOSER_SERVICE_PREFIX}-service-1
-                """
-            ),
-            textwrap.dedent(
-                """
+                """),
+            textwrap.dedent("""
                     apiVersion: v1
                     kind: List
                     items:
@@ -173,13 +170,11 @@ def test_main(mocker: MockerFixture, cli_args: Sequence[str], expected: Context)
                             - args:
                             - ping
                             - test-repository-test-branch-service-1
-                """
-            ),
+                """),
             id="List with single item with ${KOMPOSER_SERVICE_PREFIX} env var",
         ),
         pytest.param(
-            textwrap.dedent(
-                """
+            textwrap.dedent("""
                     - apiVersion: networking.k8s.io/v1
                       kind: Ingress
                       spec:
@@ -199,10 +194,8 @@ def test_main(mocker: MockerFixture, cli_args: Sequence[str], expected: Context)
                           - hosts:
                               - api.repository-name-branch-name.${KOMPOSER_INGRESS_DOMAIN}
                             secretName: app-tls-cert
-                """
-            ),
-            textwrap.dedent(
-                f"""
+                """),
+            textwrap.dedent(f"""
                     - apiVersion: networking.k8s.io/v1
                       kind: Ingress
                       spec:
@@ -222,8 +215,7 @@ def test_main(mocker: MockerFixture, cli_args: Sequence[str], expected: Context)
                           - hosts:
                               - api.repository-name-branch-name.{cli.DEFAULT_INGRESS_DOMAIN}
                             secretName: app-tls-cert
-                """
-            ),
+                """),
             id="Single item with ${KOMPOSER_INGRESS_DOMAIN} env var",
         ),
     ],
