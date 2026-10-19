@@ -137,11 +137,9 @@ def test_generate_deployment_environment(
     [
         pytest.param(
             {"my_service": docker_compose.Service(command="python run.py", env_file=Path(".env"))},
-            textwrap.dedent(
-                """
+            textwrap.dedent("""
                 MY_ENV=my-value
-                """
-            ),
+                """),
             Path(".env"),
             kubernetes.Deployment(
                 apiversion="apps/v1",
@@ -185,11 +183,9 @@ def test_generate_deployment_environment(
                     command="python run.py", env_file=Path(".env.docker")
                 )
             },
-            textwrap.dedent(
-                """
+            textwrap.dedent("""
                 MY_ENV=my-value
-                """
-            ),
+                """),
             Path(".env.docker"),
             kubernetes.Deployment(
                 apiversion="apps/v1",
